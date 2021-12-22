@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faHome, faChartPie, faPoll, faShoppingCart, faDonate } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faComments, faHome, faFish, faChartPie, faPoll, faShoppingCart, faDonate } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
 
 const NavBar = ({setPage}) => {
@@ -25,9 +25,9 @@ const NavBar = ({setPage}) => {
         className="mt-5 ml-5 sticky flex top-0 absolute rounded-full shadow-xl"
         style={{width:'100%', height:'50px', overflow:'hidden'}}
         variants={variants}
+        initial="notActive"
         animate={menuActive ? "active" : "notActive"}
-        transition={{ duration: 0.5, tween: 'tween'}}
-        >
+        transition={{ duration: 0.5, tween: 'tween'}} >
             <motion.button className="rounded-full py-3 px-3.5 shadow-lg" 
                 whileHover={{ scale:1.1, transition: {duration: 0.2}}}
                 onClick={() => {menuPressed()}}
@@ -38,11 +38,17 @@ const NavBar = ({setPage}) => {
                 <FontAwesomeIcon  icon={faHome} /> 
                 Home
             </motion.button>
-            <motion.button className={buttonStyling}>
+            <motion.button className={buttonStyling} onClick={() => setPage("portfolio")}>
                 <FontAwesomeIcon  icon={faChartPie} /> Manage Portfolios 
             </motion.button>
             <motion.button className={buttonStyling} onClick={() => setPage("cryptomarket")}>
                 <FontAwesomeIcon  icon={faPoll} /> CryptoMarket Data
+            </motion.button>
+            <motion.button className={buttonStyling} onClick={() => setPage("whalewatch")}>
+                <FontAwesomeIcon  icon={faFish} /> Whale Watch 
+            </motion.button>
+            <motion.button className={buttonStyling} onClick={() => setPage("chat")}>
+                <FontAwesomeIcon  icon={faComments} /> Chat Rooms
             </motion.button>
             <motion.button className={buttonStyling}  >
                 <FontAwesomeIcon  icon={faShoppingCart} /> MarketPlace
@@ -50,7 +56,6 @@ const NavBar = ({setPage}) => {
             <motion.button className={buttonStyling} onClick={() => setPage("donation")}>
                 <FontAwesomeIcon  icon={faDonate} /> Donate :)
             </motion.button>
-
     </motion.div>)
 }
 

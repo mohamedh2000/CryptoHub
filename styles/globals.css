@@ -16,7 +16,7 @@ html,
 }
 /* Optional: show position indicator in red */
 ::-webkit-scrollbar-thumb {
-  background: #FF0000;
+  background: white;
 }
 a {
   color: inherit;
