@@ -4,19 +4,22 @@ import axios from 'axios';
 import Transaction from './Transaction';
 import { motion, AnimatePresence } from 'framer-motion';
 
-
+//opensea API 
 const Portfolio = () => {
 
     const web3 = new Web3(window.ethereum);
     const [transactions, setTransactions] = useState([]);
+    const [contractAddresses, setContractAddresses] = useState([]);
     const [w3Id, setW3Id] = useState("");
     const [showTransactions, setShowTransactions] = useState(false);
+
 
     useEffect(() => {
         web3.eth.getAccounts().then((acc) => {
             setW3Id(acc[0].trim());
             axios(`/api/wallet/${acc[0]}`).then((data) => {
-                setTransactions(data['data']);
+                setTransactions(data['data'][0]);
+                setContractAddresses(data['data'][1]);
             })
         })
     }, [])
@@ -41,8 +44,13 @@ const Portfolio = () => {
         }
       }
 
+      // table of all holdings and weighted averages 
+      // pie chart of all holdings 
+
     return (
         <div className="flex h-screen w-screen flex-col absolute items-center">
+
+
             <button className="rounded-xl flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400" 
                 style={{minWidth: '800px', marginTop:'10%'}} 
                 onClick={() => {setShowTransactions(!showTransactions)}}>

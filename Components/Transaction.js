@@ -25,6 +25,7 @@ const Transaction = ({props, w3, w3Id }) => {
     let props_gasUsed = w3.utils.fromWei(props['cumulativeGasUsed']);
     let isError = parseInt(props['isError']) == 1;
     let trans_hash = props['hash'];
+    let tokenSymb = props['tokenSymbol'] ? props['tokenSymbol'] : "ETH";
 
 
     //do ether to dollar conversion
@@ -56,7 +57,10 @@ const Transaction = ({props, w3, w3Id }) => {
         animate="show"
         exit="hidden">
             <h1 className={transactionType}> 
-                {isError ? <FontAwesomeIcon  icon={faExclamationCircle} /> : <FontAwesomeIcon  icon={faCheckCircle} />} {incomingTransaction ? "IN" : "OUT"} 
+                {isError ? 
+                    <FontAwesomeIcon  icon={faExclamationCircle} /> : 
+                    <FontAwesomeIcon  icon={faCheckCircle} />} 
+                {incomingTransaction ? "IN" : "OUT"} - {tokenSymb}
                 <p className="float-right text-base font-light italic text-black" > {timeString} </p> 
             </h1>
             <div>
@@ -67,7 +71,11 @@ const Transaction = ({props, w3, w3Id }) => {
                 }
             </div>
             <div className="flex flex-col w-full">
-                <p><b>Value: </b> {props_val} Ether </p>
+                {props['tokenID'] ? 
+                    <p><b> {props['tokenName']} Minted </b></p>
+                    :
+                    <p><b>Value: </b> {props_val} {tokenSymb == 'ETH' ? 'Ether' : tokenSymb} </p>                
+                }
                 <p><b>Total Gas Used: </b> {props_gasUsed} Ether </p>
                 <p><b>Contract Address: </b> {props_contractAdd} </p>
             </div>
