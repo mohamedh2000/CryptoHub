@@ -42,13 +42,17 @@ const Portfolio = () => {
       }
 
     return (
-        <div className="flex h-screen w-screen flex-col">
-            <button onClick={() => {setShowTransactions(!showTransactions)}}>Transactions</button>
-            <AnimatePresence>
+        <div className="flex h-screen w-screen flex-col absolute items-center">
+            <button className="rounded-xl flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400" 
+                style={{minWidth: '800px', marginTop:'10%'}} 
+                onClick={() => {setShowTransactions(!showTransactions)}}>
+                    Transactions
+            </button>
+            <AnimatePresence className="flex">
                 {showTransactions && (
                     <motion.ul id="collapseTrans" 
                         className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll" 
-                        style={{ minWidth: '800px', marginTop: '10%', marginLeft: '25%' }}
+                        style={{ minWidth: '800px', marginTop: '20px'}}
                         variants={container}
                         initial={{opacity: 0}}
                         animate="show"

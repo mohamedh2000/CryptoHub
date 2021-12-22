@@ -47,7 +47,7 @@ const Transaction = ({props, w3, w3Id }) => {
     }
 
     let transactionType = (incomingTransaction ? "text-green-400 " : "text-red-400 ") + "text-lg font-bold tracking-wide w-full" ; 
-    let ringTransactionType = (incomingTransaction ? "ring-green-300 " : "ring-red-300 ") + "flex m-4 p-4 rounded-xl ring-2 flex-col w-11/12"; 
+    let ringTransactionType = (incomingTransaction ? "ring-green-300 " : "ring-red-300 ") + "flex my-4 p-4 rounded-xl ring-2 flex-col w-full"; 
 
     return (
         <motion.li className={ringTransactionType} 
