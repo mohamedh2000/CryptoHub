@@ -84,7 +84,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      <NavBar setPage={setPage}/>
+      <div>
+        <NavBar setPage={setPage}/>
+        </div>
+        <div>
       {
         (cryptoMarket ? <CryptoMarket /> 
           : donation ? <Donation /> : 
@@ -93,6 +96,7 @@ export default function Home() {
           
           )
       }
+      </div>
     </div>
   )
 }
