@@ -52,7 +52,7 @@ const Portfolio = () => {
 
   return (
     <div className="flex h-full w-full flex-col absolute items-center">
-        <div id="wallet_chart">
+        <div id="wallet_chart" className="mt-20">
             <UserChart />
         </div>
       <div>

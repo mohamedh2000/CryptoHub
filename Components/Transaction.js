@@ -27,7 +27,6 @@ const Transaction = ({props, w3, w3Id }) => {
     let trans_hash = props['hash'];
     let tokenSymb = props['tokenSymbol'] ? props['tokenSymbol'] : "ETH";
 
-
     //do ether to dollar conversion
     //is failed? 
     //transaction fee 
@@ -79,9 +78,12 @@ const Transaction = ({props, w3, w3Id }) => {
                 <p><b>Total Gas Used: </b> {props_gasUsed} Ether </p>
                 <p><b>Contract Address: </b> {props_contractAdd} </p>
             </div>
-            <a className="text-blue-500 mt-5" style={{width:'fit-content'}} target="_blank" href={`https://etherscan.io/tx/${trans_hash}`}>
-                <FontAwesomeIcon className="mr-2" icon={faExternalLinkAlt} /> 
-                {trans_hash}
+            <a className="text-blue-500 mt-5" 
+                style={{width:'fit-content'}} target="_blank" 
+                href={`https://etherscan.io/tx/${trans_hash}`} 
+                rel="noreferrer">
+                    <FontAwesomeIcon className="mr-2" icon={faExternalLinkAlt} /> 
+                    {trans_hash}
             </a>
         </motion.li>
     )
