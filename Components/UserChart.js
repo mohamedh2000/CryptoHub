@@ -4,22 +4,19 @@ import { Pie } from '@visx/shape';
 import { Text } from '@visx/text';
 import $ from 'jquery';
 
-const UserChart = () => {
+const UserChart = ({userCoins}) => {
   const width = 400;
   const half = width / 2;
   const [active, setActive] = useState(null);
-  const coins = [
-    { symbol: "ADA", amount: 200, color: "#0033ad", inUSD: 1.48 },
-    { symbol: "SOL", amount: 15, color: "#00ffbd", inUSD: 37.6 },
-    { symbol: "BTC", amount: 1, color: "#F7931A", inUSD: 37 },
-  ];
+  console.log(userCoins);
+
 
   return (
     <main>
       <svg width={width} height={width}>
         <Group top={half} left={half}>
           <Pie
-            data={coins}
+            data={userCoins}
             pieValue={(data) => data.amount * data.inUSD}
             outerRadius={half}
             innerRadius={({ data }) => {
@@ -31,7 +28,6 @@ const UserChart = () => {
             {(pie) => {
               //arcs are each piece of the pie for each segment/coin
               return pie.arcs.map((arc) => {
-                console.log(arc);
                 return (
                   <g key={arc.data.symbol}>
                     <path
@@ -59,11 +55,11 @@ const UserChart = () => {
             <>
               <Text textAnchor="middle" fill="#000000" fontSize="30" dy={-15}>
                 {`$${Math.floor(
-                  coins.reduce((acc, coin) => acc + coin.amount * coin.inUSD, 0)
+                  userCoins.reduce((acc, coin) => acc + coin.amount * coin.inUSD, 0)
                 )}`}
               </Text>
               <Text textAnchor="middle" fill="#000000" fontSize="20" dy={15}>
-                {`${coins.length} Assets`}
+                {`${userCoins.length} Assets`}
               </Text>
             </>
           )}

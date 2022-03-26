@@ -1,9 +1,10 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import CryptoMarket from './cryptomarket';
 import Donation from './donate';
 import NavBar from '../Components/NavBar.js';
 import Portfolio from '../Components/Portfolio.js'
 import '../styles/Home.module.css';
+import axios from 'axios';
 
 export default function Home() {
 

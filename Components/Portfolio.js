@@ -10,6 +10,7 @@ const Portfolio = () => {
   const web3 = new Web3(window.ethereum);
   const [transactions, setTransactions] = useState([]);
   const [nfts, setNfts] = useState([]);
+  const [coins, setCoins] = useState([]);
   const [contractAddresses, setContractAddresses] = useState([]);
   const [w3Id, setW3Id] = useState("");
   const [showTransactions, setShowTransactions] = useState(false);
@@ -17,12 +18,21 @@ const Portfolio = () => {
 
   useEffect(() => {
     web3.eth.requestAccounts().then((acc) => {
-      console.log(web3);
       setW3Id(acc[0].trim());
       axios(`/api/wallet/${acc[0]}`).then((data) => {
-        console.log(data);
         setTransactions(data["data"][0]);
-        setContractAddresses(data["data"][1]);
+        setContractAddresses(data["data"][1]); //TODO: Figure out what this is
+        let tempCoins = data["data"][2];
+        tempCoins.forEach(async (coin) => {
+          let results = await axios(`/api/crypto/id/mapping/${coin.symbol}`);
+          let resultsArr = results["data"]["data"];
+          let mappedId = resultsArr.filter((cryp) => 
+            {return cryp.symbol == coin.symbol && 
+              cryp["platform"]["token_address"] == coin.tokenAddress;})[0].id;
+          let quote = await axios(`/api/crypto/id/${mappedId}`);
+          coin.inUSD = quote["data"]["data"][mappedId]["quote"]["USD"]["price"].toFixed(2);
+        })
+        setCoins(tempCoins);
       });
     });
   }, []);
@@ -53,7 +63,7 @@ const Portfolio = () => {
   return (
     <div className="flex h-full w-full flex-col absolute items-center">
         <div id="wallet_chart" className="mt-20">
-            <UserChart />
+            <UserChart userCoins={coins}/>
         </div>
       <div>
         <button
