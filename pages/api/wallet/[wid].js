@@ -4,11 +4,27 @@ export default function handler(req, res){
     const etherscan_api_key = 'MK6YTGB5FRU29PTB4VR2J54XFUMXFQFNBN';
     const etherscan_domain = 'https://api.etherscan.io/api';
 
+    const currentTime = Date.now();
+
+    let optionBlockNum = { 
+        action: 'getblocknobytime',
+        timestamp: Math.floor( currentTime / 1000), //get current time in Unix
+        closest: "before",
+        apikey: etherscan_api_key 
+    }
+
+    let searchStringBlock = "?module=block";
+    for( let key in optionBlockNum) {
+        searchStringBlock += `&${key}=${optionBlockNum[key]}`;
+    }
+
+    let currentBlock = getBlock(etherscan_domain, searchStringBlock);
+    
     let option = {
         action: 'txlist',
         address: req.query.wid,
         startblock: 0,
-        endblock: 13807035, //TODO: Get a way to find the most recent block number,
+        endblock: currentBlock, //TODO: Get a way to find the most recent block number,
         sort: 'desc', 
         apikey: etherscan_api_key
     }
@@ -17,7 +33,7 @@ export default function handler(req, res){
         action: 'tokentx',
         address: req.query.wid, 
         startblock: 0,
-        endblock: 13807035,
+        endblock: currentBlock,
         sort: 'desc',
         apikey: etherscan_api_key
     }
@@ -26,7 +42,7 @@ export default function handler(req, res){
         action: 'tokennfttx',
         address: req.query.wid, 
         startblock: 0,
-        endblock: 13807035,
+        endblock: currentBlock,
         sort: 'desc',
         apikey: etherscan_api_key 
     }
@@ -104,6 +120,11 @@ export default function handler(req, res){
 
 }
 
+async function getBlock(etherscanDomain, searchBlock) {
+    let data = await axios(etherscanDomain + searchBlock);
+    return parseInt(data["result"]);
+}
+
 function insertSortedArray(baseArray, resultsToAdd, contractAddresses) {
     for (let num in resultsToAdd) {
         let currentTime = parseInt(resultsToAdd[num]['timeStamp']);
@@ -121,3 +142,4 @@ function insertSortedArray(baseArray, resultsToAdd, contractAddresses) {
     }
 
 }
+
