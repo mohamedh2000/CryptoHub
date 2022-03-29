@@ -35,7 +35,7 @@ const Transaction = ({props, w3, w3Id }) => {
         hidden: { 
             y: -1000, 
             transition: {
-                duration: 1, type:'spring'
+                duration: 0.55, type:'spring'
             }
         },
         show: { 

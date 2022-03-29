@@ -10,7 +10,6 @@ const UserChart = ({userCoins}) => {
   const [active, setActive] = useState(null);
   console.log(userCoins);
 
-
   return (
     <main>
       <svg width={width} height={width}>

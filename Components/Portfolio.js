@@ -4,6 +4,7 @@ import axios from 'axios';
 import Transaction from './Transaction';
 import { motion, AnimatePresence } from 'framer-motion';
 import UserChart from '../Components/UserChart';
+import Nft from '../Components/Nft';
 
 //opensea API 
 const Portfolio = () => {
@@ -11,7 +12,6 @@ const Portfolio = () => {
   const [transactions, setTransactions] = useState([]);
   const [nfts, setNfts] = useState([]);
   const [coins, setCoins] = useState([]);
-  const [contractAddresses, setContractAddresses] = useState([]);
   const [w3Id, setW3Id] = useState("");
   const [showTransactions, setShowTransactions] = useState(false);
   const [showNfts, setShowNfts] = useState(false);
@@ -21,8 +21,9 @@ const Portfolio = () => {
       setW3Id(acc[0].trim());
       axios(`/api/wallet/${acc[0]}`).then((data) => {
         setTransactions(data["data"][0]);
-        setContractAddresses(data["data"][1]); //TODO: Figure out what this is
-        let tempCoins = data["data"][2];
+        let tempCoins = data["data"][1];
+        setNfts(data["data"][2]);
+        console.log(nfts);
         tempCoins.forEach(async (coin) => {
           let results = await axios(`/api/crypto/id/mapping/${coin.symbol}`);
           let resultsArr = results["data"]["data"];
@@ -119,12 +120,10 @@ const Portfolio = () => {
               animate="show"
               exit="hidden"
             >
-              {nfts.map((Nft) => (
+              {nfts.map((nftInfo) => (
                 <Nft
                   key="nfts"
-                  props={trans}
-                  w3={web3}
-                  w3Id={w3Id}
+                  nft={nftInfo}
                 />
               ))}
             </motion.ul>

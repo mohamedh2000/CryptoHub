@@ -72,7 +72,6 @@ export default function handler(req, res){
     axios(etherscan_domain + searchStringI).then(async (data) => {
         let results_ethTrans = data['data']['result'];
         let arr = [];
-        let contractAddresses = new Set();
 
         for (let x in results_ethTrans) {
             arr.push(results_ethTrans[x]);
@@ -82,7 +81,6 @@ export default function handler(req, res){
         let results_erc20_Trans = erc20_data['data']['result'];
         let nft_data = await axios(etherscan_domain + searchStringNft)
         let results_nft_Trans = nft_data['data']['result'];
-
         let tempMap = new Map();
         let tokenAmounts = [];
         results_erc20_Trans.forEach((transaction) => {
@@ -106,15 +104,10 @@ export default function handler(req, res){
             }
         });
         //sorting by timeStamp since both lists are already sorted for us
-        insertSortedArray(arr, results_erc20_Trans, contractAddresses);
-        insertSortedArray(arr, results_nft_Trans, contractAddresses);
+        insertSortedArray(arr, results_erc20_Trans);
+        insertSortedArray(arr, results_nft_Trans);
 
-        let tempAdd = [];
-        for(let address of contractAddresses) {
-            tempAdd.push(address);
-        }
-        
-        let retArr = [arr, tempAdd, tokenAmounts];
+        let retArr = [arr, tokenAmounts, results_nft_Trans];
         res.status(200).send(retArr);
     })
 
@@ -125,10 +118,9 @@ async function getBlock(etherscanDomain, searchBlock) {
     return parseInt(data["result"]);
 }
 
-function insertSortedArray(baseArray, resultsToAdd, contractAddresses) {
+function insertSortedArray(baseArray, resultsToAdd) {
     for (let num in resultsToAdd) {
         let currentTime = parseInt(resultsToAdd[num]['timeStamp']);
-        contractAddresses.add(resultsToAdd[num]['contractAddress']);
         for (let i = 0; i < baseArray.length; i++) {
             if (currentTime >= parseInt(baseArray[i]['timeStamp'])) {
                 baseArray.splice(i, 0, resultsToAdd[num]);
@@ -142,4 +134,3 @@ function insertSortedArray(baseArray, resultsToAdd, contractAddresses) {
     }
 
 }
-

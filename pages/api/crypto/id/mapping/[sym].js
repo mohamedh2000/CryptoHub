@@ -6,7 +6,6 @@ export default function handler(req, res) {
     const coinSym = req.query.sym;
 
     ///cryptocurrency/quotes/latest
-    console.log("im in here");
     axios.get(coinMK_domain + `/v1/cryptocurrency/map?symbol=${coinSym}`, {
         headers: {
             'X-CMC_PRO_API_KEY': coinMK_api_key
