@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Group } from '@visx/group';
 import { Pie } from '@visx/shape';
 import { Text } from '@visx/text';
@@ -8,6 +8,15 @@ const UserChart = ({userCoins}) => {
   const width = 400;
   const half = width / 2;
   const [active, setActive] = useState(null);
+
+  //for dev cases only
+  userCoins.forEach((coin) => {
+    coin.amount = Math.random() * 10;
+    while (coin.amount * coin.inUSD > 1000) {
+      coin.amount = Math.random() * 10; 
+    }
+  })
+  
   console.log(userCoins);
 
   return (

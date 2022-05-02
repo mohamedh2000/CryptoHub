@@ -50,7 +50,7 @@ const NavBar = ({setPage}) => {
             <motion.button className={buttonStyling} onClick={() => setPage("chat")}>
                 <FontAwesomeIcon  icon={faComments} /> Chat Rooms
             </motion.button>
-            <motion.button className={buttonStyling}  >
+            <motion.button className={buttonStyling} onClick={() => setPage("marketplace")}>
                 <FontAwesomeIcon  icon={faShoppingCart} /> MarketPlace
             </motion.button>
             <motion.button className={buttonStyling} onClick={() => setPage("donation")}>

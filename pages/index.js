@@ -4,7 +4,7 @@ import Donation from './donate';
 import NavBar from '../Components/NavBar.js';
 import Portfolio from '../Components/Portfolio.js'
 import '../styles/Home.module.css';
-import axios from 'axios';
+import MarketPlace from '../Components/MarketPlace.js';
 
 export default function Home() {
 
@@ -90,11 +90,10 @@ export default function Home() {
         </div>
         <div>
       {
-        (cryptoMarket ? <CryptoMarket /> 
-          : donation ? <Donation /> : 
-          <Portfolio />
-          
-          
+        (cryptoMarket ? <CryptoMarket /> :
+           donation ? <Donation /> : 
+           marketplace ? <MarketPlace /> :
+           <Portfolio />
           )
       }
       </div>

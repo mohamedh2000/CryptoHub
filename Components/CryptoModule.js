@@ -1,33 +1,38 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBookmark, faChartPie, faInfoCircle, faComments } from '@fortawesome/free-solid-svg-icons';
+import { faBookmark, faChartPie, faChartBar, faComments } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
+import CryptoChart from '../Components/CryptoChart.js';
+import axios from 'axios';
 
 const CryptoModule = ({ data }) => {
 
     const [bookmarkActive, setBookmarkActive] = useState(false);
     const [portfolioActive, setPortfolioActive] = useState(false);
     const [chatActive, setChatActive] = useState(false);
-    const [dataTab, setDataTab] = useState(true);
+    const [chartTab, setChartTab] = useState(true);
+    const [currentData, setCurrentData] = useState([]);
 
     const activeTabCSS = "group bg-yellow-400 p-1.5 mx-4 rounded-xl font-medium shadow-xl";
     const inActiveTabCSS = "transform group hover:bg-yellow-200 hover:scale-105 p-1.5 mx-4 rounded-xl font-light hover:shadow-md";
     const activeBookmarkCSS = "p-2 right-0 bg-yellow-400 rounded-full px-3.5 float-right";
     const inActiveBookmarkCSS = "p-2 right-0 rounded-full px-3.5 hover:bg-yellow-200 float-right";
 
+    const cryptoType = data['tags'][0] == 'pos' ? 'POS (Proof of Stake)' : 'POW (Proof of Work)';
+
     function activateButton(name) {
         if(name == "portfolio") {
-            setDataTab(false);
+            setChartTab(false);
             setPortfolioActive(true);
             setChatActive(false);
         }
-        else if(name == "data") {
-            setDataTab(true);
+        else if(name == "chart") {
+            setChartTab(true);
             setPortfolioActive(false);
             setChatActive(false);
         }
         else if(name == "chat") {
-            setDataTab(false);
+            setChartTab(false);
             setPortfolioActive(false);
             setChatActive(true);
         }
@@ -36,8 +41,15 @@ const CryptoModule = ({ data }) => {
         }
     }
 
-    return (
+    useEffect(() => {
+        let cryptoSym = data['name'];
+        axios(`/api/crypto/id/chart/${cryptoSym}`).then((chartData) => {
+            //make the chart here 
+            setCurrentData(chartData.data);
+        })
+    }, [data]);
 
+    return (
         <motion.div className=".select-none shadow-2xl bg-white rounded-xl flex
         shadow-lg w-1/2 my-4 right-0 justify-center mr-8 p-8 flex-col sticky"
         style={{y: '-100%', height:'80vh'}}
@@ -46,10 +58,10 @@ const CryptoModule = ({ data }) => {
         >
             <div className="w-full h-1/10 r-0 my-1 top-0">
                 <button 
-                className={dataTab ? activeTabCSS : inActiveTabCSS}
-                onClick={() => {activateButton("data")}}>
-                    <FontAwesomeIcon className="mr-1" icon={faInfoCircle} /> 
-                    Data
+                className={chartTab ? activeTabCSS : inActiveTabCSS}
+                onClick={() => {activateButton("chart")}}>
+                    <FontAwesomeIcon className="mr-1" icon={faChartBar} /> 
+                    Chart
                 </button>
                 <button 
                 className={portfolioActive ? activeTabCSS : inActiveTabCSS}
@@ -63,22 +75,24 @@ const CryptoModule = ({ data }) => {
                     <FontAwesomeIcon className="mr-1" icon={faComments} /> 
                     Chat
                 </button>
-
                 <button className={bookmarkActive ? activeBookmarkCSS : inActiveBookmarkCSS}
                 onClick={() => {activateButton("bookmark")}}>
                     <FontAwesomeIcon icon={faBookmark} /> 
                 </button>
             </div>
             <div className=" w-full my-1 h-full">
-                {console.log(data)}
+                <i>{cryptoType}</i>
+                <div>
+                    <b>Circulating Supply: </b>
+                    <i>{data['circulating_supply'].toFixed(2)}</i>
+                </div>
+
+                <div>
+                    <CryptoChart chartData={currentData} /> 
+                </div>
             </div>
-
-
             </motion.div>)
 
 }
-
-
-
 
 export default CryptoModule;

@@ -7,7 +7,7 @@ import { faExclamationCircle, faCheckCircle, faExternalLinkAlt } from '@fortawes
 
 //Props is the transaction 
 //w3 is the web3 Object 
-const Transaction = ({props, w3, w3Id }) => {
+const Transaction = ({props, w3, w3Id, currentChain }) => {
 
     let incomingTransaction = props['to'].trim().toLowerCase() == w3Id.toLowerCase();
     let timeStamp = new Date(0);
@@ -26,6 +26,9 @@ const Transaction = ({props, w3, w3Id }) => {
     let isError = parseInt(props['isError']) == 1;
     let trans_hash = props['hash'];
     let tokenSymb = props['tokenSymbol'] ? props['tokenSymbol'] : "ETH";
+
+
+
 
     //do ether to dollar conversion
     //is failed? 
@@ -80,7 +83,7 @@ const Transaction = ({props, w3, w3Id }) => {
             </div>
             <a className="text-blue-500 mt-5" 
                 style={{width:'fit-content'}} target="_blank" 
-                href={`https://etherscan.io/tx/${trans_hash}`} 
+                href={`${currentChain}/${trans_hash}`} 
                 rel="noreferrer">
                     <FontAwesomeIcon className="mr-2" icon={faExternalLinkAlt} /> 
                     {trans_hash}
