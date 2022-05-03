@@ -78,7 +78,7 @@ const Transaction = ({props, w3, w3Id, currentChain }) => {
                     :
                     <p><b>Value: </b> {props_val} {tokenSymb == 'ETH' ? 'Ether' : tokenSymb} </p>                
                 }
-                <p><b>Total Gas Used: </b> {props_gasUsed} Ether </p>
+                <p><b>Total Gas Used: </b> {props_gasUsed} {currentChain == 'ETH' ? 'Ether' : 'BSC'} </p>
                 <p><b>Contract Address: </b> {props_contractAdd} </p>
             </div>
             <a className="text-blue-500 mt-5" 

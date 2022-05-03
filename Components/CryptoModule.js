@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBookmark, faChartPie, faChartBar, faComments } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
+import { getNum } from './func';
 import CryptoChart from '../Components/CryptoChart.js';
 import axios from 'axios';
 
@@ -84,7 +85,7 @@ const CryptoModule = ({ data }) => {
                 <i>{cryptoType}</i>
                 <div>
                     <b>Circulating Supply: </b>
-                    <i>{data['circulating_supply'].toFixed(2)}</i>
+                    <i>{getNum(data['circulating_supply'].toFixed(2))}</i>
                 </div>
 
                 <div>

@@ -10,7 +10,6 @@ export default async function handler(req, res) {
 
 	await client.connect();
 
-
 	const value = await client.get('crypto_market_data');
 	if(value == null) {
 		let cryptoMarketData = await axios.get(coinMK_domain + '/v1/cryptocurrency/listings/latest', { 
@@ -20,12 +19,10 @@ export default async function handler(req, res) {
 		});
 
 		await client.set('crypto_market_data', JSON.stringify(cryptoMarketData['data']));
-		await client.sendCommand(['EXPIRE', 'crypto_market_data', '3600']);
+		await client.sendCommand(['EXPIRE', 'crypto_market_data', '900']);
 		res.send(cryptoMarketData);
 	}
 	else {
 		res.send(value);
 	}
-	
-	await client.disconnect();
 }
