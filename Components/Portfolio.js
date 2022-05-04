@@ -35,7 +35,7 @@ const Portfolio = () => {
 			setW3Id(acc[0].trim());
 			axios(`/api/wallet/${acc[0]}`).then((data) => {
 				setWalletData(data['data']);
-				$("#allChainButton").focus();
+				$("#"+chains.ALL).focus();
 				setChain(chains.ALL);
 			});
 		});
@@ -44,16 +44,19 @@ const Portfolio = () => {
 	useEffect(() => {
 		switch (currentChain) {
 			case chains.ALL: 
+				$("#"+chains.ALL).focus();
 				changeChain(walletData);
 				setChainDomain(chainDomains.ALL);
 				break;
 			case chains.ETH:
 				changeChain(walletData.eth);
 				setChainDomain(chainDomains.ETH);
+				$("#"+chains.ETH).focus();
 				break;
 			case chains.BSC: 
 				changeChain(walletData.bsc);
 				setChainDomain(chainDomains.BSC);
+				$("#"+chains.BSC).focus();
 				break;
 			default:
 				break;
@@ -151,6 +154,7 @@ const Portfolio = () => {
 				changeToChain(walletData);
 				break;
 		}
+		$("#"+currentChain).focus();
 
 	}
 
@@ -179,21 +183,39 @@ const Portfolio = () => {
 		" focus:ring-4 focus:ring-yellow-400 focus:ring-opacity-50"
 	}
 
+	const getChainCoins = () => {
+		let retArr = []
+		for(let key in walletData) {
+			let chainData = {};
+			chainData.chain = key;
+			chainData.coins = walletData[key][1];
+			chainData.amount = 0;
+			chainData.color = "#" + ((1<<24)*Math.random() | 0).toString(16);
+			walletData[key][1].forEach((coin) => {
+				chainData.amount += (coin.amount * coin.inUSD)
+			});
+			retArr.push(chainData);
+		}
+		return retArr;
+	}
+
 	return (
 		<div className="flex h-full w-full flex-col absolute items-center">
 		<div>
-		<button id="allChainButton" className={style.chainStyle} onClick={() => {setChain(chains.ALL)}}>
+		<button id={chains.ALL} className={style.chainStyle} onClick={() => {setChain(chains.ALL)}}>
 		All	
 		</button>
-		<button className={style.chainStyle} onClick={() => {setChain(chains.ETH)}}>
+		<button id={chains.ETH} className={style.chainStyle} onClick={() => {setChain(chains.ETH)}}>
 		ETH
 		</button>
-		<button className={style.chainStyle} onClick={() => {setChain(chains.BSC)}} >
+		<button id={chains.BSC} className={style.chainStyle} onClick={() => {setChain(chains.BSC)}} >
 		BSC
 		</button>
 		</div>
 		<div id="wallet_chart" className="mt-20">
-		<UserChart userCoins={coins}/>
+		<UserChart userCoins={
+			(currentChain != 'all' ? coins : getChainCoins())
+		} currentChain={currentChain} setChain={setChain}/>
 		</div>
 		<div>
 		<button
