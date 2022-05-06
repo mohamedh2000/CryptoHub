@@ -180,7 +180,10 @@ const Portfolio = () => {
 
 	const style = {
 		chainStyle: "ring-2 ring-white shadow-xl py-3 focus:outline-none m-2 rounded-lg w-32" + 
-		" focus:ring-4 focus:ring-yellow-400 focus:ring-opacity-50"
+		" focus:ring-4 focus:ring-yellow-400 focus:ring-opacity-50",
+		walletStyle: "flex-shrink-0 bg-yellow-400 text-white text-base font-semibold py-2 px-4 rounded-lg shadow-md" + 
+		" hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400" + 
+		" focus:ring-offset-2 focus:ring-offset-yellow-200"
 	}
 
 	const getChainCoins = () => {
@@ -200,7 +203,17 @@ const Portfolio = () => {
 	}
 
 	return (
-		<div className="flex h-full w-full flex-col absolute items-center">
+		<div className="flex h-full w-full flex-row absolute items-center">
+		<div className="flex h-full w-2/12 flex-col absolute items-center float-left">
+		<ul className="flex h-full w-9/10 overflow-hidden" style={{marginTop:'20%', marginLeft:'20%'}}>
+		<li className="h-1/8"  >
+		<button className={style.walletStyle}>
+		{w3Id}
+		</button>
+		</li>
+		</ul>
+		</div>
+		<div className="flex h-full w-10/12 flex-col absolute items-center float-right right-0">
 		<div>
 		<button id={chains.ALL} className={style.chainStyle} onClick={() => {setChain(chains.ALL)}}>
 		All	
@@ -217,72 +230,75 @@ const Portfolio = () => {
 			(currentChain != 'all' ? coins : getChainCoins())
 		} currentChain={currentChain} setChain={setChain}/>
 		</div>
-		<div>
-		<button
-		className="rounded-xl flex text-center justify-center tracking-wide 
-		text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
-		style={{ minWidth: "800px", marginTop: "10%" }}
-		onClick={() => {
-			setShowTransactions(!showTransactions);
-		}}
-		>
-		Transactions
-		</button>
-		<AnimatePresence className="flex">
-		{showTransactions && (
-			<motion.ul
-			id="collapseTrans"
-			className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll"
-			style={{ minWidth: "800px", marginTop: "20px" }}
-			variants={container}
-			initial={{ opacity: 0 }}
-			animate="show"
-			exit="hidden"
-			>
-			{transactions.map((trans) => (
-				<Transaction
-				key="trans_1"
-				props={trans}
-				w3={web3}
-				w3Id={w3Id}
-				currentChain={chainDomain != null ? chainDomain : chainDomains[trans.chain]}
-				/>
-			))}
-			</motion.ul>
-		)}
-		</AnimatePresence>
+		<div className="flex columns-2 gap-8 w-full items-center " >  
+			<div className="flex w-1/2 flex-col items-center">
+				<button
+				className="rounded-xl mr-5 flex text-center justify-center tracking-wide 
+				text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
+				style={{ minWidth: "800px" }}
+				onClick={() => {
+					setShowTransactions(!showTransactions);
+				}}
+				>
+				Transactions
+				</button>
+				<AnimatePresence >
+				{showTransactions && (
+					<motion.ul
+					id="collapseTrans"
+					className=" flex flex-col  w-3/4 max-w-5xl overflow-y-scroll"
+					style={{ minWidth: "800px", marginTop: "20px" }}
+					variants={container}
+					initial={{ opacity: 0 }}
+					animate="show"
+					exit="hidden"
+					>
+					{transactions.map((trans) => (
+						<Transaction
+						key="trans_1"
+						props={trans}
+						w3={web3}
+						w3Id={w3Id}
+						currentChain={chainDomain != null ? chainDomain : chainDomains[trans.chain]}
+						/>
+					))}
+					</motion.ul>
+				)}
+				</AnimatePresence>
+			</div>
+			<div className="flex w-1/2 flex-col items-center ">
+				<button
+				className="rounded-xl flex text-center justify-center tracking-wide 
+				text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
+				style={{ minWidth: "800px"}}
+				onClick={() => {
+					setShowNfts(!showNfts);
+				}}
+				>
+				Nfts
+				</button>
+				<AnimatePresence >
+				{showNfts && (
+					<motion.ul
+					id="collapseNft"
+					className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll"
+					style={{ minWidth: "800px", marginTop: "20px" }}
+					variants={container}
+					initial={{ opacity: 0 }}
+					animate="show"
+					exit="hidden"
+					>
+					{nfts.map((nftInfo) => (
+						<Nft
+						key="nfts"
+						nft={nftInfo}
+						/>
+					))}
+					</motion.ul>
+				)}
+				</AnimatePresence>
+			</div>
 		</div>
-		<div>
-		<button
-		className="rounded-xl flex text-center justify-center tracking-wide 
-		text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
-		style={{ minWidth: "800px", marginTop: "10%" }}
-		onClick={() => {
-			setShowNfts(!showNfts);
-		}}
-		>
-		Nfts
-		</button>
-		<AnimatePresence className="flex">
-		{showNfts && (
-			<motion.ul
-			id="collapseTrans"
-			className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll"
-			style={{ minWidth: "800px", marginTop: "20px" }}
-			variants={container}
-			initial={{ opacity: 0 }}
-			animate="show"
-			exit="hidden"
-			>
-			{nfts.map((nftInfo) => (
-				<Nft
-				key="nfts"
-				nft={nftInfo}
-				/>
-			))}
-			</motion.ul>
-		)}
-		</AnimatePresence>
 		</div>
 		</div>
 	);
