@@ -230,7 +230,7 @@ const Portfolio = () => {
 			(currentChain != 'all' ? coins : getChainCoins())
 		} currentChain={currentChain} setChain={setChain}/>
 		</div>
-		<div className="flex columns-2 gap-8 w-full items-center " >  
+		<div className="flex columns-2 w-full" >  
 			<div className="flex w-1/2 flex-col items-center">
 				<button
 				className="rounded-xl mr-5 flex text-center justify-center tracking-wide 
@@ -266,7 +266,7 @@ const Portfolio = () => {
 				)}
 				</AnimatePresence>
 			</div>
-			<div className="flex w-1/2 flex-col items-center ">
+			<div className="flex w-1/2 flex-col items-center">
 				<button
 				className="rounded-xl flex text-center justify-center tracking-wide 
 				text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
