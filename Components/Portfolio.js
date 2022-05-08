@@ -205,13 +205,13 @@ const Portfolio = () => {
 	return (
 		<div className="flex h-full w-full flex-row absolute items-center">
 		<div className="flex h-full w-2/12 flex-col absolute items-center float-left">
-		<ul className="flex h-full w-9/10 overflow-hidden" style={{marginTop:'20%', marginLeft:'20%'}}>
-		<li className="h-1/8"  >
-		<button className={style.walletStyle}>
-		{w3Id}
-		</button>
-		</li>
-		</ul>
+			<ul className="flex h-full w-9/10 overflow-hidden" style={{marginTop:'20%', marginLeft:'20%'}}>
+				<li className="h-1/8"  >
+					<button className={style.walletStyle}>
+					{w3Id}
+					</button>
+				</li>
+			</ul>
 		</div>
 		<div className="flex h-full w-10/12 flex-col absolute items-center float-right right-0">
 		<div>

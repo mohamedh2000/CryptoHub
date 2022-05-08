@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { getNum } from './func';
 import CryptoChart from '../Components/CryptoChart.js';
 import axios from 'axios';
+import $ from 'jquery';
 
 const CryptoModule = ({ data }) => {
 
@@ -88,8 +89,9 @@ const CryptoModule = ({ data }) => {
                     <i>{getNum(data['circulating_supply'].toFixed(2))}</i>
                 </div>
 
-                <div>
-                    <CryptoChart chartData={currentData} /> 
+                <div className="chartContainer w-full">
+                    <CryptoChart chartData={currentData} 
+	    		containerWidth={$(".chartContainer").width()}/> 
                 </div>
             </div>
             </motion.div>)

@@ -85,10 +85,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      <div>
-        <NavBar setPage={setPage}/>
-        </div>
-        <div>
+	  <NavBar setPage={setPage}/>
+        <div style={{height:'80%', marginTop:'5%'}}>
       {
         (cryptoMarket ? <CryptoMarket /> :
            donation ? <Donation /> : 
