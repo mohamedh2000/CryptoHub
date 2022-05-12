@@ -10,8 +10,8 @@ export default async function handler(req, res){
     }
 
     const blockchainApis = {
-        ethKey: 'MK6YTGB5FRU29PTB4VR2J54XFUMXFQFNBN',
-        bscKey: '4X98WRPY9H9N55V6E7NQBAKGMWVNKHMCPY'
+        ethKey: process.env.ETH_KEY,
+        bscKey: process.env.BSC_KEY 
     }
 
     const currentTime = Date.now();

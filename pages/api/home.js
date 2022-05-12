@@ -2,7 +2,7 @@ const axios = require('axios');
 import { Redis } from '@upstash/redis'
 
 export default async function handler(req, res) {
-	const coinMK_api_key = '793e67ba-734a-450c-8863-cab9af5f9224';
+	const coinMK_api_key = process.env.COINMARKETCAP_KEY;
 	const coinMK_domain = 'https://pro-api.coinmarketcap.com';
 
 	const client = Redis.fromEnv();
