@@ -5,6 +5,7 @@ import Transaction from './Transaction';
 import { motion, AnimatePresence } from 'framer-motion';
 import UserChart from '../Components/UserChart';
 import Nft from '../Components/Nft';
+import WalletList from '../Components/WalletList.js';
 import $ from 'jquery';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -206,31 +207,8 @@ const Portfolio = () => {
 
 	return (
 		<div className="flex h-full w-full flex-row absolute items-center">
-		<div className="flex h-full w-2/12 flex-col absolute items-center float-left space-y-4">
-			<ul className="flex max-h-36 w-full overflow-hidden" style={{marginTop:'20%'}}>
-				<li className={style.walletStyle}>
-					{w3Id}
-					<button className="float-right">
-						<FontAwesomeIcon icon={faTrash} />
-					</button>
-				</li>
-			</ul>
-			<div className="flex h-1/8 w-full flex-row space-x-2">
-				<input className="flex w-10/12 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400" />
-				<select name="chain" className="flex w-2/12 rounded-ful focus:outline-none">
-					<option value="ETH"> ETH </option>
-					<option value="BSC"> BSC </option>
-				</select>
-				
-				<button>
-					<FontAwesomeIcon icon={faCheck} />
-				</button>
-			</div>
-			<button className="flex h-1/8 w-full justify-center hover:bg-gray-200 py-4 px-4 shadow-md rounded-full"> 
-				<FontAwesomeIcon icon={faPlus} />
-			</button>
-		</div>
-		<div className="flex h-full w-10/12 flex-col absolute items-center float-right right-0">
+		<WalletList w3Id={w3Id}/>	
+		<div className="flex h-full w-9/12 flex-col absolute items-center float-right right-0">
 		<div>
 		<button id={chains.ALL} className={style.chainStyle} onClick={() => {setChain(chains.ALL)}}>
 		All	

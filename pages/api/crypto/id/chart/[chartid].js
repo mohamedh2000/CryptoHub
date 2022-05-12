@@ -7,12 +7,12 @@ export default async function handler(req, res){
 
 	const client = Redis.fromEnv();
 
-	const value = await client.get('coin_gecko_coins');
+	let value = await client.get('coin_gecko_coins');
 
 	if(value == null) {
 		let data = await CoinGeckoClient.coins.list();
 		await client.set('coin_gecko_coins', data);
-		await client.expire('coin_gecko_coins', '900'); //weekly
+		await client.expire('coin_gecko_coins', '604800'); //weekly
 		value = data;
 	}
 	let availableCoins = value.data;
