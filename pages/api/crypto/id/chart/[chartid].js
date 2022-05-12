@@ -1,28 +1,22 @@
 const axios = require('axios');
 const CoinGecko = require('coingecko-api');
-const redis = require('redis');
+import { Redis } from '@upstash/redis'
 const CoinGeckoClient = new CoinGecko();
 
 export default async function handler(req, res){
 
-	const client = redis.createClient();
-
-	client.on('error', (err) => console.log('Redis Client Error', err));
-
-	await client.connect();
-
+	const client = Redis.fromEnv();
 
 	const value = await client.get('coin_gecko_coins');
 
 	if(value == null) {
 		let data = await CoinGeckoClient.coins.list();
 		await client.set('coin_gecko_coins', data);
-		await client.sendCommand(['EXPIRE', 'coin_gecko_coins', '604800']);//weekly
+		await client.expire('coin_gecko_coins', '900'); //weekly
 		value = data;
 	}
-	let availableCoins = JSON.parse(value).data;
-	let coinSupported = availableCoins.filter(coin => 
-		coin.name == req.query.chartid);
+	let availableCoins = value.data;
+	let coinSupported = availableCoins.filter(coin => coin.name == req.query.chartid);
 	if(coinSupported == []) {
 		res.send([]);
 	}

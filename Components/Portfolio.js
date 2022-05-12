@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import UserChart from '../Components/UserChart';
 import Nft from '../Components/Nft';
 import $ from 'jquery';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const chains = {
 	ALL : 'all', ETH : 'eth', BSC : 'bsc'
@@ -181,9 +183,9 @@ const Portfolio = () => {
 	const style = {
 		chainStyle: "ring-2 ring-white shadow-xl py-3 focus:outline-none m-2 rounded-lg w-32" + 
 		" focus:ring-4 focus:ring-yellow-400 focus:ring-opacity-50",
-		walletStyle: "flex-shrink-0 bg-yellow-400 text-white text-base font-semibold py-2 px-4 rounded-lg shadow-md" + 
+		walletStyle: "bg-yellow-400 text-white text-base w-full rounded-full font-semibold py-2 px-4 shadow-md" + 
 		" hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400" + 
-		" focus:ring-offset-2 focus:ring-offset-yellow-200"
+		" focus:ring-offset-2 focus:ring-offset-yellow-200 "
 	}
 
 	const getChainCoins = () => {
@@ -204,14 +206,29 @@ const Portfolio = () => {
 
 	return (
 		<div className="flex h-full w-full flex-row absolute items-center">
-		<div className="flex h-full w-2/12 flex-col absolute items-center float-left">
-			<ul className="flex h-full w-9/10 overflow-hidden" style={{marginTop:'20%', marginLeft:'20%'}}>
-				<li className="h-1/8"  >
-					<button className={style.walletStyle}>
+		<div className="flex h-full w-2/12 flex-col absolute items-center float-left space-y-4">
+			<ul className="flex max-h-36 w-full overflow-hidden" style={{marginTop:'20%'}}>
+				<li className={style.walletStyle}>
 					{w3Id}
+					<button className="float-right">
+						<FontAwesomeIcon icon={faTrash} />
 					</button>
 				</li>
 			</ul>
+			<div className="flex h-1/8 w-full flex-row space-x-2">
+				<input className="flex w-10/12 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+				<select name="chain" className="flex w-2/12 rounded-ful focus:outline-none">
+					<option value="ETH"> ETH </option>
+					<option value="BSC"> BSC </option>
+				</select>
+				
+				<button>
+					<FontAwesomeIcon icon={faCheck} />
+				</button>
+			</div>
+			<button className="flex h-1/8 w-full justify-center hover:bg-gray-200 py-4 px-4 shadow-md rounded-full"> 
+				<FontAwesomeIcon icon={faPlus} />
+			</button>
 		</div>
 		<div className="flex h-full w-10/12 flex-col absolute items-center float-right right-0">
 		<div>
@@ -233,9 +250,7 @@ const Portfolio = () => {
 		<div className="flex columns-2 w-full" >  
 			<div className="flex w-1/2 flex-col items-center">
 				<button
-				className="rounded-xl mr-5 flex text-center justify-center tracking-wide 
-				text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
-				style={{ minWidth: "800px" }}
+				className="rounded-xl mr-5 flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
 				onClick={() => {
 					setShowTransactions(!showTransactions);
 				}}
@@ -247,7 +262,7 @@ const Portfolio = () => {
 					<motion.ul
 					id="collapseTrans"
 					className=" flex flex-col  w-3/4 max-w-5xl overflow-y-scroll"
-					style={{ minWidth: "800px", marginTop: "20px" }}
+					style={{  marginTop: "20px" }}
 					variants={container}
 					initial={{ opacity: 0 }}
 					animate="show"
@@ -268,9 +283,7 @@ const Portfolio = () => {
 			</div>
 			<div className="flex w-1/2 flex-col items-center">
 				<button
-				className="rounded-xl flex text-center justify-center tracking-wide 
-				text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
-				style={{ minWidth: "800px"}}
+				className="rounded-xl flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
 				onClick={() => {
 					setShowNfts(!showNfts);
 				}}
@@ -282,7 +295,7 @@ const Portfolio = () => {
 					<motion.ul
 					id="collapseNft"
 					className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll"
-					style={{ minWidth: "800px", marginTop: "20px" }}
+					style={{ marginTop: "20px" }}
 					variants={container}
 					initial={{ opacity: 0 }}
 					animate="show"

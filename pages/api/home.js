@@ -1,14 +1,11 @@
 const axios = require('axios');
-const redis = require('redis');
+import { Redis } from '@upstash/redis'
 
 export default async function handler(req, res) {
 	const coinMK_api_key = '793e67ba-734a-450c-8863-cab9af5f9224';
 	const coinMK_domain = 'https://pro-api.coinmarketcap.com';
-	const client = redis.createClient();
 
-	client.on('error', (err) => console.log('Redis Client Error', err));
-
-	await client.connect();
+	const client = Redis.fromEnv();
 
 	const value = await client.get('crypto_market_data');
 	if(value == null) {
@@ -19,9 +16,7 @@ export default async function handler(req, res) {
 		});
 
 		await client.set('crypto_market_data', JSON.stringify(cryptoMarketData['data']));
-		client.sendCommand(['EXPIRE', 'crypto_market_data', '900']).then(() => {
-			res.send(cryptoMarketData);
-		});;
+		await client.expire('crypto_market_data', '900');
 	}
 	else {
 		res.send(value);

@@ -23,7 +23,7 @@ const NavBar = ({setPage}) => {
     const buttonStyling = "px-10 whitespace-nowrap"
 
     return (
-	   <div className="mt-5 ml-5 w-full flex-row absolute flex top-0" style={{height:'5%'}}>
+	   <div className="ml-5 mt-5 w-full flex-row absolute flex top-0 " style={{height:'5%'}}>
 	    <motion.div
 		    className="flex rounded-full shadow-xl w-4/5"
 		style={{width:'80%', height:'50px', overflow:'hidden'}}

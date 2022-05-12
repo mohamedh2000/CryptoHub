@@ -9,6 +9,7 @@ import { useSession, signIn, signOut } from "next-auth/react"
 const User = () => {
 	const [userEmail, setUserEmail] = useState([]);
 	const { data: session, status } = useSession();
+	const [visibility, setVisibility] = useState(false);
 	const states = {
 		LOADING: 'loading', 
 		AUTH: 'authenticated',
@@ -21,12 +22,17 @@ const User = () => {
 		}
 	}, [session]);
 
+	const style = {
+		hiddenDropDown: "h-20 hidden rounded-lg shadow-xl p-3 w-full",
+		visibleDropDown: "h-20 rounded-lg shadow-xl p-3 w-full"
+	}
+
 	return (
-		<div className="flex flex-col w-1/5 float-right right-0 absolute">
-			<button className="rounded-full shadow-xl p-3 w-6" >
+		<div className="flex flex-col w-1/5 absolute right-10 items-end">
+			<button onClick={() => setVisibility(!visibility)} className="rounded-full shadow-xl p-3 w-6" >
 				<FontAwesomeIcon icon={faUser} />
 			</button>
-			<ul className="h-20 rounded-lg shadow-xl p-3 w-2/5">
+			<ul className={(visibility ? style.visibleDropDown : style.hiddenDropDown)}>
 				{
 					(status == states.AUTH ? 
 						<b> Hello! {session.user.email} </b>
