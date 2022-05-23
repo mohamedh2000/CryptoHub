@@ -119,28 +119,8 @@ const Portfolio = () => {
 
 	const changeToChain = (walletData) => {
 		setTransactions(walletData[0]);
-		let tempCoins = walletData[1];
+		setCoins(walletData[1]);
 		setNfts(walletData[2]);
-		tempCoins.forEach(async (coin) => {
-			let results = await axios(`/api/crypto/id/mapping/${coin.symbol}`);
-			let resultsArr = results["data"]["data"];
-			let temp = resultsArr.filter((cryp) => 
-				{
-					let toMatchCrypAddress = cryp["platform"]["token_address"].toLowerCase();
-					let crypToMatchAddress = coin.tokenAddress.toLowerCase();
-					return cryp.symbol == coin.symbol && toMatchCrypAddress == crypToMatchAddress;
-				})[0];
-			try {
-				let mappedId = temp.id;
-				let quote = await axios(`/api/crypto/id/${mappedId}`);
-				coin.inUSD = quote["data"]["data"][mappedId]["quote"]["USD"]["price"].toFixed(2);
-			}
-			catch(e) {
-				console.log(e);
-			}
-		});
-		setCoins(tempCoins);
-
 	}
 
 	const changeChain = (walletData) => {
@@ -158,7 +138,6 @@ const Portfolio = () => {
 				break;
 		}
 		$("#"+currentChain).focus();
-
 	}
 
 	const container = {

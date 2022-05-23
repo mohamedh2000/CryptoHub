@@ -8,17 +8,8 @@ const UserChart = ({userCoins, currentChain, setChain}) => {
 	const [chainName, setChainName] = useState(null);
 	const [currentCoin, setCoin] = useState({});
 	
-	//for dev cases only
-	const randomize = (coins) => {
-		coins.forEach((coin) => {
-			coin.amount = Math.random() * 10;
-			while (coin.amount * coin.inUSD > 1000) {
-				coin.amount = Math.random() * 10; 
-				}
-			})
-		}
-
-	randomize(userCoins);
+	console.log(userCoins);
+	
 	const hoverChain = (e) => {
 		if(chainName != e.name) {
 			setChainName(e.name);
