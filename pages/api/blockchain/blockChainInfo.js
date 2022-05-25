@@ -54,64 +54,91 @@ async function getBlockchainInfo(domain, address, apiKey, currentBlock) {
 		searchStringNft += `&${key}=${optionNft[key]}`;
 	}
 
-	return axios(domain + searchStringI).then(async (data) => {
-		let results_ethTrans = data['data']['result'];
-		let arr = [];
+	let chainInfo = await axios(domain + searchStringI);
+	let results_ethTrans = chainInfo['data']['result'];
+	let arr = [];
 
-		for (let x in results_ethTrans) {
-			arr.push(results_ethTrans[x]);
-		} //circular json issue so use this as a get around for now
+	for (let x in results_ethTrans) {
+		arr.push(results_ethTrans[x]);
+	} //circular json issue so use this as a get around for now
 
-		let erc20_data = await axios(domain + searchStringErc20);
-		let results_erc20_Trans = erc20_data['data']['result'];
-		let nft_data = await axios(domain + searchStringNft)
-		let results_nft_Trans = nft_data['data']['result'];
-		let tempMap = new Map();
-		let tokenAmounts = [];
-		
-		const client = Redis.fromEnv();
-		let allCoins = await client.get('coin_gecko_coins');
+	let erc20_data = await axios(domain + searchStringErc20);
+	let results_erc20_Trans = erc20_data['data']['result'];
+	let nft_data = await axios(domain + searchStringNft)
+	let results_nft_Trans = nft_data['data']['result'];
+	let tempMap = new Map();
+	let tokenAmounts = [];
 
-		results_erc20_Trans.forEach(async (transaction) => {
-			let tempSymbol = transaction.tokenSymbol;
-			if(!tempMap.has(tempSymbol)) {
-				let val = {symbol: null, name: null, amount: 0, color: null, inUSD: null, tokenAddress: null};
-				val.color = "#" + ((1<<24)*Math.random() | 0).toString(16); //TODO: Make sure they aren't repeated
-				val.name = transaction.tokenName;
-				val.symbol = tempSymbol;
-				val.tokenAddress = transaction.contractAddress;
-				//TODO:GET INUSD
-					
-				let tempCoin = allCoins.data.filter((coin) => 
-					coin.name == val.name 
-				);
-				console.log(tempCoin);
-				if(tempCoin != []) {
-				//	val.inUSD = await CoinGeckoClient.simple.price({id:tempCoin[0]['id'], vs_currencies:['usd']});
-				}
-				
-				
+	const client = Redis.fromEnv();
+	let allCoins = await client.get('coin_gecko_coins');
+	//const value = await client.get('crypto_market_data');
 
-				optionTokenBalance.contractAddress = transaction.contractAddress;
-				let searchStringTokenAmounts = "?module=account";
-				for (let key in optionTokenBalance) {
-					searchStringTokenAmounts += `&${key}=${optionTokenBalance[key]}`;
-				}
-				axios(domain + searchStringTokenAmounts).then((tokenBalance) => {
-					val.amount = tokenBalance["result"];
-				});
-				tempMap.set(tempSymbol, 0);
-				tokenAmounts.push(val);
+
+	const coinMK_api_key = process.env.COINMARKETCAP_KEY;
+	const coinMK_domain = 'https://pro-api.coinmarketcap.com';
+
+	 
+
+	results_erc20_Trans.forEach( (transaction) => {
+		let tempSymbol = transaction.tokenSymbol;
+		if(!tempMap.has(tempSymbol)) {
+			let val = {symbol: null, name: null, amount: 0, color: null, inUSD: null, tokenAddress: null};
+			val.color = "#" + ((1<<24)*Math.random() | 0).toString(16); //TODO: Make sure they aren't repeated
+			val.name = transaction.tokenName;
+			val.symbol = tempSymbol;
+			val.tokenAddress = transaction.contractAddress;
+			tempMap.set(tempSymbol.toLowerCase(), val);
+		}
+	});
+
+	let cryptoMarketData = await axios.get(coinMK_domain + 
+		`/v2/cryptocurrency/quotes/latest?symbol=${Array.from(tempMap.keys())}&skip_invalid=true`, {
+			headers: {
+				'X-CMC_PRO_API_KEY': coinMK_api_key
 			}
 		});
-		//sorting by timeStamp since both lists are already sorted for us
-		insertSortedArray(arr, results_erc20_Trans);
-		insertSortedArray(arr, results_nft_Trans);
 
-		return [arr, tokenAmounts, results_nft_Trans];
-	})
+	for(let coin in cryptoMarketData['data']['data']) {
+		let currCoin = tempMap.get(coin.toLowerCase());
+		let allMatches = cryptoMarketData['data']['data'][coin];
+		if(allMatches.length == 1) {
+			let quote = allMatches[0]["quote"]["USD"]["price"];
+			currCoin.inUSD = quote;
+			currCoin.cmcId = allMatches[0]["id"];
+			tempMap.set(coin.toLowerCase(), currCoin);
+		}
+		else {
+			let coinMatch = allMatches.filter((coinMatch) => 
+				{
+					coinMatch.name == currCoin.name;
+				});
+			if(coinMatch.length != 0) {
+				let quote = coinMatch[0]["quote"]["USD"]["price"];
+				currCoin.inUSD = quote;
+				currCoin.cmcId = coinMatch[0]["id"];
+				tempMap.set(coin.toLowerCase(), currCoin);
+			}
+		}
+		getAmountUSD(coin.toLowerCase(), tempMap);
+	}
+
+	async function getAmountUSD(coin, tempMap) {
+		let tempCoin = tempMap.get(coin);
+		optionTokenBalance.contractAddress = tempCoin.tokenAddress;
+		let searchStringTokenAmounts = "?module=account";
+		for (let key in optionTokenBalance) {
+			searchStringTokenAmounts += `&${key}=${optionTokenBalance[key]}`;
+		}
+		let balance = await axios(domain + searchStringTokenAmounts)
+		tempCoin.amount = balance.data.result;
+		tempCoin.totalVal = tempCoin.amount * tempCoin.inUSD;
+		tempMap.set(coin, tempCoin);
+	}
+	//sorting by timeStamp since both lists are already sorted for us
+	insertSortedArray(arr, results_erc20_Trans);
+	insertSortedArray(arr, results_nft_Trans);
+	return [arr, Array.from(tempMap.values()), results_nft_Trans];
 }
-
 
 function insertSortedArray(baseArray, resultsToAdd) {
 	for (let num in resultsToAdd) {

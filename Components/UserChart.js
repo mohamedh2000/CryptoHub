@@ -4,6 +4,10 @@ import $ from 'jquery';
 
 const UserChart = ({userCoins, currentChain, setChain}) => {
 
+	useEffect(() => {
+		randomize(userCoins);	
+	}, [userCoins]);
+
 	const [chainData, setChainData] = useState([])
 	const [chainName, setChainName] = useState(null);
 	const [currentCoin, setCoin] = useState({});
@@ -14,7 +18,6 @@ const UserChart = ({userCoins, currentChain, setChain}) => {
 		if(chainName != e.name) {
 			setChainName(e.name);
 			let newData = e.coins;
-			randomize(newData);
 			setChainData(newData);	
 		}
 	}
@@ -29,25 +32,36 @@ const UserChart = ({userCoins, currentChain, setChain}) => {
 		}
 	}
 
+	//for dev cases only
+	const randomize = (coins) => {
+		coins.forEach((coin) => {
+			coin.amount = Math.random() * 10;
+			while (coin.amount * coin.inUSD > 1000) {
+				coin.amount = Math.random() * 10;
+			}
+			coin.totalVal = coin.amount * coin.inUSD;
+		})
+	}
+
 	function CustomLabel({viewBox}) {
 		const { cx, cy } = viewBox;
 		return (
 			<>
-				<text x={cx} y={cy - 10} verticalAnchor="middle" textAnchor="middle"  >
-					<tspan fontSize="26">
-						{currentCoin.symbol || ""}
-					</tspan>
-				</text>
-				<text x={cx} y={cy + 20} verticalAnchor="middle" textAnchor="middle">
-					<tspan fontSize="0.5vw" >
-						{currentCoin.name || ""}
-					</tspan>
-				</text>
-				<text x={cx} y={cy + 60} verticalAnchor="middle" textAnchor="middle">
-					<tspan fontSize="26">
-						${currentCoin.value || ""}
-					</tspan>
-				</text>
+			<text x={cx} y={cy - 10} verticalAnchor="middle" textAnchor="middle"  >
+			<tspan fontSize="26">
+			{currentCoin.symbol || ""}
+			</tspan>
+			</text>
+			<text x={cx} y={cy + 20} verticalAnchor="middle" textAnchor="middle">
+			<tspan fontSize="0.5vw" >
+			{currentCoin.name || ""}
+			</tspan>
+			</text>
+			<text x={cx} y={cy + 60} verticalAnchor="middle" textAnchor="middle">
+			<tspan fontSize="26">
+			${currentCoin.value || ""}
+			</tspan>
+			</text>
 			</>
 		)
 	}
@@ -55,76 +69,76 @@ const UserChart = ({userCoins, currentChain, setChain}) => {
 	return (
 		<main>
 		{  
-		(currentChain != 'all' ? 
-			<PieChart width={800} height={600}>
+			(currentChain != 'all' ? 
+				<PieChart width={800} height={600}>
 				<Pie data={userCoins} cx="50%" cy="50%" 
-				dataKey="amount" nameKey="symbol" 
+				dataKey="totalVal" nameKey="symbol" 
 				innerRadius={200}  
 				paddingAngle={1}
 				onMouseOver={(e) => hoverCoin(e)}
 				>
-					<Label content={<CustomLabel />}  position="center" />
+				<Label content={<CustomLabel />}  position="center" />
 				{
 					userCoins.map((coin) => (
 						<Cell key={coin.symbol} fill={coin.color} cornerRadius={30}/>
 					))
 				}
 				</Pie>
-			</PieChart>
-			:
-			<PieChart width={800} height={600}>
+				</PieChart>
+				:
+				<PieChart width={800} height={600}>
 				<Pie data={userCoins} cx="50%" cy="50%" dataKey="amount" 
-					nameKey="chain" innerRadius={210} paddingAngle={1} 
-					onMouseDown={(e) => {setChain(e.chain)}} 
-					onMouseOver={(e)=> hoverChain(e)} >
-					
-					<Label content={({viewBox}) => {
-						const {cx, cy} = viewBox;
-						return (
-							<text x={cx} y={cy - 160} verticalAnchor="middle" textAnchor="middle"> 
-								<tspan fontSize="26">
-									{chainName ? chainName.toUpperCase() :  ""}	
-								</tspan>
-							</text>
-						)
-					}} position="center"/>
-					{
-						userCoins.map((chain) => ( 
-							<Cell key={chain.chain} fill={chain.color} 
-								cornerRadius={30} />
-						))
-					}
-					<Label content={({viewBox}) => {
-						const {cx, cy} = viewBox;
-						return (
-							<text x={cx} y={cy + 160} verticalAnchor="middle" textAnchor="middle"> 
-								<tspan fontSize="26">
-									${chainData.reduce((total, coin ) => { 
-										return total + (coin.amount * coin.inUSD) 
-									}, 0).toFixed(2) }
-								</tspan>
-							</text>
-						)
-					}} position="center" />
+				nameKey="chain" innerRadius={210} paddingAngle={1} 
+				onMouseDown={(e) => {setChain(e.chain)}} 
+				onMouseOver={(e)=> hoverChain(e)} >
+
+				<Label content={({viewBox}) => {
+					const {cx, cy} = viewBox;
+					return (
+						<text x={cx} y={cy - 160} verticalAnchor="middle" textAnchor="middle"> 
+						<tspan fontSize="26">
+						{chainName ? chainName.toUpperCase() :  ""}	
+						</tspan>
+						</text>
+					)
+				}} position="center"/>
+				{
+					userCoins.map((chain) => ( 
+						<Cell key={chain.chain} fill={chain.color} 
+						cornerRadius={30} />
+					))
+				}
+				<Label content={({viewBox}) => {
+					const {cx, cy} = viewBox;
+					return (
+						<text x={cx} y={cy + 160} verticalAnchor="middle" textAnchor="middle"> 
+						<tspan fontSize="26">
+						${chainData.reduce((total, coin ) => { 
+							return total + (coin.amount * coin.inUSD) 
+						}, 0).toFixed(2) }
+						</tspan>
+						</text>
+					)
+				}} position="center" />
 				</Pie>
 				<Pie id="innerPie" data={chainData} paddingAngle={1} 
-					cx="50%" cy ="50%" dataKey="amount"
-					nameKey="symbol" innerRadius={100} outerRadius={120} 
-					onMouseOver={(e) => hoverCoin(e)} >
-					
-					<Label content={<CustomLabel />}  position="center" />
-					{
-						chainData.map((coin) => ( 
+				cx="50%" cy ="50%" dataKey="amount"
+				nameKey="symbol" innerRadius={100} outerRadius={120} 
+				onMouseOver={(e) => hoverCoin(e)} >
+
+				<Label content={<CustomLabel />}  position="center" />
+				{
+					chainData.map((coin) => ( 
 						<Cell key={coin.symbol} fill={coin.color} 
-							cornerRadius={10}/>
-						))
-					}
+						cornerRadius={10}/>
+					))
+				}
 				</Pie>
-			</PieChart>
-		)
+				</PieChart>
+			)
 		}
 		</main>
-		);
+	);
 };
 
 export default UserChart;
