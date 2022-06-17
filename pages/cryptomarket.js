@@ -9,7 +9,8 @@ import { motion } from 'framer-motion';
 export default function CryptoMarket() {
     const [listings, setListings] = useState([]);
     const [chosenCrypto, setChosenCrypto] = useState(false);
-    const [chosenCryptoData, setChosenCryptoData] = useState();
+	const [chosenCID, setChosenCID] = useState(null);    
+const [chosenCryptoData, setChosenCryptoData] = useState();
 
     const variants = {
         isClicked: { width: '50%' },
@@ -28,8 +29,9 @@ export default function CryptoMarket() {
 
     function openDashboard(cid) {
         axios(`/api/crypto/id/${cid}`).then(async (data) => {
-            setChosenCryptoData(await data['data']['data'][cid]);
-            setChosenCrypto(true);
+	    setChosenCryptoData(await data['data']);
+	    setChosenCID(cid);
+	    setChosenCrypto(true);
         })
     }
 
@@ -71,7 +73,7 @@ export default function CryptoMarket() {
 
             {
                 chosenCrypto ?
-                    < CryptoModule data={chosenCryptoData} />
+                    < CryptoModule data={chosenCryptoData}  CID={chosenCID} />
                     :
                     <></>
             }

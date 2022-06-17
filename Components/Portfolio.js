@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import UserChart from '../Components/UserChart';
 import Nft from '../Components/Nft';
 import WalletList from '../Components/WalletList.js';
+import WalletForm from './WalletForm.js';
 import $ from 'jquery';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -23,6 +24,7 @@ const chainDomains = {
 //opensea API 
 const Portfolio = () => {
 	const web3 = new Web3(window.ethereum);
+	const [visibility, setVisibility] = useState(false);
 	const [currentChain, setChain] = useState(null);
 	const [walletData, setWalletData] = useState(null)
 	const [chainDomain, setChainDomain] = useState("");
@@ -186,8 +188,9 @@ const Portfolio = () => {
 
 	return (
 		<div className="flex h-full w-full flex-row absolute items-center">
-		<WalletList w3Id={w3Id}/>	
+		<WalletList setVisibility={setVisibility} w3Id={w3Id}/>	
 		<div className="flex h-full w-9/12 flex-col absolute items-center float-right right-0">
+		<WalletForm setVisibility={setVisibility} visible={visibility} />
 		<div>
 		<button id={chains.ALL} className={style.chainStyle} onClick={() => {setChain(chains.ALL)}}>
 		All	
