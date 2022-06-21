@@ -5,7 +5,6 @@ import NavBar from '../Components/NavBar.js';
 import Portfolio from '../Components/Portfolio.js'
 import '../styles/Home.module.css';
 import MarketPlace from '../Components/MarketPlace.js';
-import { Redis } from '@upstash/redis'; 
 
 export default function Home() {
 

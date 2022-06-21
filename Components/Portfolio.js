@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Web3 from 'web3'
 import axios from 'axios';
 import Transaction from './Transaction';
@@ -10,6 +10,8 @@ import WalletForm from './WalletForm.js';
 import $ from 'jquery';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { getSession } from "next-auth/react"
+import { Redis } from '@upstash/redis'; 
 
 const chains = {
 	ALL : 'all', ETH : 'eth', BSC : 'bsc'
@@ -20,10 +22,12 @@ const chainDomains = {
 	ETH: 'https://etherscan.io/tx', 
 	BSC: 'https://bscscan.com/tx'
 }
-
 //opensea API 
 const Portfolio = () => {
+	const userRef = useRef();
 	const web3 = new Web3(window.ethereum);
+	const [allWallets, setAllWallets] = useState([]);
+	const [allWalletData, setAllWalletData] = useState([]);
 	const [visibility, setVisibility] = useState(false);
 	const [currentChain, setChain] = useState(null);
 	const [walletData, setWalletData] = useState(null)
@@ -35,16 +39,40 @@ const Portfolio = () => {
 	const [showTransactions, setShowTransactions] = useState(false);
 	const [showNfts, setShowNfts] = useState(false);
 
-	useEffect(() => {
-		web3.eth.requestAccounts().then((acc) => {
+	useEffect(async () => {
+		/*web3.eth.requestAccounts().then((acc) => {
 			setW3Id(acc[0].trim());
-			axios(`/api/wallet/${acc[0]}`).then((data) => {
-				setWalletData(data['data']);
+			axios(`/api/wallet/${acc[0]}`).then((walletInfo) => {
+				setWalletData(walletInfo['data']);
 				$("#"+chains.ALL).focus();
 				setChain(chains.ALL);
 			});
+		});*/
+		getSession().then((userData) => {
+			userRef.current = userData.user.email; 
+			axios(`/api/user/${userRef.current}`).then((userInfo) => {
+				setAllWallets(userInfo.data);
+			});
 		});
+
 	}, []);
+
+	useEffect(async () => {
+		let allPromises = [];
+		allWallets.map((walletId) => {
+			allPromises.push(axios(`/api/wallet/${walletId}`));
+		});
+		Promise.all(allPromises).then((vals) => {
+			vals.map((val) => {
+				console.log(val.data);
+				setAllWalletData([...allWalletData, val.data]);	
+			});
+			setChain(chains.ALL);
+			console.log(allWalletData);
+		}).catch((e) => {
+			console.log(e);
+		});
+	}, [allWallets]);
 
 	useEffect(() => {
 		switch (currentChain) {
@@ -188,9 +216,12 @@ const Portfolio = () => {
 
 	return (
 		<div className="flex h-full w-full flex-row absolute items-center">
-		<WalletList setVisibility={setVisibility} w3Id={w3Id}/>	
+
+		<WalletList setVisibility={setVisibility} allWallets={allWallets} />	
 		<div className="flex h-full w-9/12 flex-col absolute items-center float-right right-0">
-		<WalletForm setVisibility={setVisibility} visible={visibility} />
+		<div style={{'visibility':(visibility ? 'visible' : 'hidden')}} className="flex h-full rounded-xl w-full bg-gray-200 z-100 absolute">
+		</div>
+		<WalletForm setVisibility={setVisibility} setAllWallets={setAllWallets} visible={visibility} userId={userRef.current} />	
 		<div>
 		<button id={chains.ALL} className={style.chainStyle} onClick={() => {setChain(chains.ALL)}}>
 		All	
@@ -208,69 +239,69 @@ const Portfolio = () => {
 		} currentChain={currentChain} setChain={setChain}/>
 		</div>
 		<div className="flex columns-2 w-full" >  
-			<div className="flex w-1/2 flex-col items-center">
-				<button
-				className="rounded-xl mr-5 flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
-				onClick={() => {
-					setShowTransactions(!showTransactions);
-				}}
-				>
-				Transactions
-				</button>
-				<AnimatePresence >
-				{showTransactions && (
-					<motion.ul
-					id="collapseTrans"
-					className=" flex flex-col  w-3/4 max-w-5xl overflow-y-scroll"
-					style={{  marginTop: "20px" }}
-					variants={container}
-					initial={{ opacity: 0 }}
-					animate="show"
-					exit="hidden"
-					>
-					{transactions.map((trans) => (
-						<Transaction
-						key="trans_1"
-						props={trans}
-						w3={web3}
-						w3Id={w3Id}
-						currentChain={chainDomain != null ? chainDomain : chainDomains[trans.chain]}
-						/>
-					))}
-					</motion.ul>
-				)}
-				</AnimatePresence>
-			</div>
-			<div className="flex w-1/2 flex-col items-center">
-				<button
-				className="rounded-xl flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
-				onClick={() => {
-					setShowNfts(!showNfts);
-				}}
-				>
-				Nfts
-				</button>
-				<AnimatePresence >
-				{showNfts && (
-					<motion.ul
-					id="collapseNft"
-					className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll"
-					style={{ marginTop: "20px" }}
-					variants={container}
-					initial={{ opacity: 0 }}
-					animate="show"
-					exit="hidden"
-					>
-					{nfts.map((nftInfo) => (
-						<Nft
-						key="nfts"
-						nft={nftInfo}
-						/>
-					))}
-					</motion.ul>
-				)}
-				</AnimatePresence>
-			</div>
+		<div className="flex w-1/2 flex-col items-center">
+		<button
+		className="rounded-xl mr-5 flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
+		onClick={() => {
+			setShowTransactions(!showTransactions);
+		}}
+		>
+		Transactions
+		</button>
+		<AnimatePresence >
+		{showTransactions && (
+			<motion.ul
+			id="collapseTrans"
+			className=" flex flex-col  w-3/4 max-w-5xl overflow-y-scroll"
+			style={{  marginTop: "20px" }}
+			variants={container}
+			initial={{ opacity: 0 }}
+			animate="show"
+			exit="hidden"
+			>
+			{transactions.map((trans) => (
+				<Transaction
+				key="trans_1"
+				props={trans}
+				w3={web3}
+				w3Id={w3Id}
+				currentChain={chainDomain != null ? chainDomain : chainDomains[trans.chain]}
+				/>
+			))}
+			</motion.ul>
+		)}
+		</AnimatePresence>
+		</div>
+		<div className="flex w-1/2 flex-col items-center">
+		<button
+		className="rounded-xl flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
+		onClick={() => {
+			setShowNfts(!showNfts);
+		}}
+		>
+		Nfts
+		</button>
+		<AnimatePresence >
+		{showNfts && (
+			<motion.ul
+			id="collapseNft"
+			className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll"
+			style={{ marginTop: "20px" }}
+			variants={container}
+			initial={{ opacity: 0 }}
+			animate="show"
+			exit="hidden"
+			>
+			{nfts.map((nftInfo) => (
+				<Nft
+				key="nfts"
+				nft={nftInfo}
+				/>
+			))}
+			</motion.ul>
+		)}
+		</AnimatePresence>
+		</div>
 		</div>
 		</div>
 		</div>

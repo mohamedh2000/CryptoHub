@@ -1,6 +1,21 @@
 import React from 'react';
+import $ from 'jquery';
+import axios from 'axios';
 
-const WalletForm  = ({setVisibility, visible}) => {
+const WalletForm  = ({setVisibility, setAllWallets, visible, userId}) => {
+	
+	const addWallet = () => {
+		setVisibility(false);
+		var selectedChain = $("input[type='radio']:checked").val();
+		var inputtedWallet = $("#fwallet").val();
+		axios({method: 'post', url: `/api/user/add/${userId}`, data: {'walletId': inputtedWallet, 
+			'chain':selectedChain}}).then((res) => {
+			setAllWallets(res.data);
+		}).catch((e) => {
+			console.log(e);
+		});
+	}
+
 	return (
 		<div id="walletForm" style={{'visibility':(visible ? 'visible' : 'hidden'), 'marginTop':'20%'}} className="flex w-8/12 absolute justify-center items-center z-40">
 			<div className="flex border-2 flex-col space-y-5 rounded-xl shadow-xl bg-white p-8 pb-10 w-full" >
@@ -18,8 +33,10 @@ const WalletForm  = ({setVisibility, visible}) => {
 				<label for="fwallet" className="font-extrabold tracking-wide"> Wallet ID </label>
 				<input id="fwallet" className="rounded-xl outline-none shadow-lg p-2" type="text" /><br/>
 				
-				<button value="Add Wallet" onClick={() => setVisibility(false)} className="rounded-xl bg-yellow-300 text-white tracking-wider ring-yellow-600 p-3 shadow-lg " > Add Wallet </button>
-			</div>
+				<button value="Add Wallet" onClick={() => addWallet()} className="rounded-xl bg-yellow-300 text-white tracking-wider ring-yellow-600 p-3 shadow-lg " > Add Wallet </button>
+				<button value="cancel" onClick={() => setVisibility(false)} className="rounded-xl bg-red-300 text-white tracking-wider ring-red-600 p-3 shadow-lg " > Cancel </button>
+
+		</div>
 		</div>
 	)
 }
