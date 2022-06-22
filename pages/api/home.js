@@ -17,6 +17,7 @@ export default async function handler(req, res) {
 
 		await client.set('crypto_market_data', JSON.stringify(cryptoMarketData['data']));
 		await client.expire('crypto_market_data', '900');
+		res.send(cryptoMarketData['data']);
 	}
 	else {
 		res.send(value);

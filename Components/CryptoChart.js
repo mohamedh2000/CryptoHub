@@ -7,7 +7,6 @@ const CryptoChart = ({ chartData, containerWidth}) => {
 
 	useEffect(() => {
 		let finalArr = [];
-		console.log(chartData);
 		if(chartData['prices']) {
 			for(let i = 0; i < chartData['prices'].length; i++) {
 				finalArr.push(
@@ -22,7 +21,6 @@ const CryptoChart = ({ chartData, containerWidth}) => {
 		}
 	}, [chartData])
 
-	console.log(chartData);    
 	return (
 		<AreaChart className="mt-10" width={containerWidth} 
 			height={400} data={chartPrices}

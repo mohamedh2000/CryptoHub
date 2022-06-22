@@ -13,7 +13,6 @@ export default function MarketPlace() {
             topCollections['collections'].forEach((collection) => {
                 let collectionToAppend = `<li> ${collection.name } </li>`;
                 let collectionImageToAppend = `<img src=${collection.image_url} width=500 height=500 />`;
-                console.log(collection);
                 $("#listCollection").append(collectionToAppend);
                 $("#listCollection").append(collectionImageToAppend);
             })

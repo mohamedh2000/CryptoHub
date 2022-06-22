@@ -7,9 +7,8 @@ import CryptoChart from '../Components/CryptoChart.js';
 import axios from 'axios';
 import $ from 'jquery';
 
-const CryptoModule = ({ data, CID }) => {
-	let baseData = data[0]['data'][CID];
-	let descriptionInfo = data[1]['data'][CID];
+const CryptoModule = ({ data, CID, metaData }) => {
+	let baseData = data;
 	const [bookmarkActive, setBookmarkActive] = useState(false);
 	const [portfolioActive, setPortfolioActive] = useState(false);
 	const [chatActive, setChatActive] = useState(false);
@@ -58,43 +57,61 @@ const CryptoModule = ({ data, CID }) => {
 		animate={{ y: '100px'}}
 		transition={{ type: "easein"}}
 		>
-		<div className="w-full h-1/10 r-0 my-1 top-0">
-		<button 
-		className={chartTab ? activeTabCSS : inActiveTabCSS}
-		onClick={() => {activateButton("chart")}}>
-		<FontAwesomeIcon className="mr-1" icon={faChartBar} /> 
-		Chart
-		</button>
-		<button 
-		className={portfolioActive ? activeTabCSS : inActiveTabCSS}
-		onClick={() => {activateButton("portfolio")}}>
-		<FontAwesomeIcon className="mr-1" icon={faChartPie} /> 
-		Portfolio
-		</button>
-		<button 
-		className={chatActive ? activeTabCSS : inActiveTabCSS}
-		onClick={() => {activateButton("chat")}}>
-		<FontAwesomeIcon className="mr-1" icon={faComments} /> 
-		Chat
-		</button>
-		<button className={bookmarkActive ? activeBookmarkCSS : inActiveBookmarkCSS}
-		onClick={() => {activateButton("bookmark")}}>
-		<FontAwesomeIcon icon={faBookmark} /> 
-		</button>
-		</div>
-		<div className=" w-full my-1 h-full">
-		<div>
-		<b>Circulating Supply: </b>
-		<i>{getNum(baseData['circulating_supply'].toFixed(2))}</i>
-		</div>
+			<div className="w-full h-1/10 r-0 my-1 top-0">
+				<button 
+				className={chartTab ? activeTabCSS : inActiveTabCSS}
+				onClick={() => {activateButton("chart")}}>
+					<FontAwesomeIcon className="mr-1" icon={faChartBar} /> 
+					Chart
+				</button>
+				<button 
+				className={portfolioActive ? activeTabCSS : inActiveTabCSS}
+				onClick={() => {activateButton("portfolio")}}>
+					<FontAwesomeIcon className="mr-1" icon={faChartPie} /> 
+					Portfolio
+				</button>
+				<button 
+				className={chatActive ? activeTabCSS : inActiveTabCSS}
+				onClick={() => {activateButton("chat")}}>
+					<FontAwesomeIcon className="mr-1" icon={faComments} /> 
+					Chat
+				</button>
+				<button className={bookmarkActive ? activeBookmarkCSS : inActiveBookmarkCSS}
+				onClick={() => {activateButton("bookmark")}}>
+					<FontAwesomeIcon icon={faBookmark} /> 
+				</button>
+			</div>
+			<div className=" w-full my-1 h-full space-y-10">
+				{
+					(metaData != undefined ? 
+					<div>
+						<img src={metaData['logo']} />
+						<b>Description: </b>
+						<i>{metaData['description']}</i>
+					</div>
+						:
+						<></>
+					)
+				}
+				<div className="chartContainer w-full">
+					<CryptoChart chartData={currentData} 
+					containerWidth={$(".chartContainer").width()}/> 
+				</div>
+			</div>
+			{
+				(metaData != undefined ? (
+					Object.keys(metaData['urls']).map((url) => {
+						if(metaData['urls'][url].length == 1) {
+							<div>
+								url: <a> metaData['urls'][url][0] </a>
+							</div>
+						}
 
-		<div className="chartContainer w-full">
-		<CryptoChart chartData={currentData} 
-		containerWidth={$(".chartContainer").width()}/> 
-		</div>
-		</div>
+					}))
+					: 
+					<></>
+				)
+			}
 		</motion.div>)
-
 }
-
 export default CryptoModule;

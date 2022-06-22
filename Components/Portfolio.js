@@ -138,7 +138,6 @@ const Portfolio = () => {
 	}
 
 	const getAllTransactions = (walletData) => {
-		console.log(walletData);
 		let allTransactions = [];
 		for(let key in walletData) {
 			let currData = walletData[key][0];
