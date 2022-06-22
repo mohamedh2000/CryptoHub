@@ -9,5 +9,4 @@ export default async function handler(req, res){
 	if(value != null) {
 		res.status(200).json(value);
 	}
-	console.log(value);
 }

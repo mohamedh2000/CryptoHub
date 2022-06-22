@@ -4,6 +4,7 @@ import $ from 'jquery';
 
 const UserChart = ({userCoins, currentChain, setChain}) => {
 
+	//for dev cases only
 	useEffect(() => {
 		randomize(userCoins);	
 	}, [userCoins]);
@@ -11,8 +12,6 @@ const UserChart = ({userCoins, currentChain, setChain}) => {
 	const [chainData, setChainData] = useState([])
 	const [chainName, setChainName] = useState(null);
 	const [currentCoin, setCoin] = useState({});
-	
-	console.log(userCoins);
 	
 	const hoverChain = (e) => {
 		if(chainName != e.name) {

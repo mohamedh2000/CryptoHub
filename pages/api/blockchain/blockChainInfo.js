@@ -1,7 +1,11 @@
+import { Redis } from '@upstash/redis';
+
 const axios = require('axios');
 const CoinGecko = require('coingecko-api');
 const CoinGeckoClient = new CoinGecko();
-import { Redis } from '@upstash/redis';
+const coinMK_api_key = process.env.COINMARKETCAP_KEY;
+const coinMK_domain = 'https://pro-api.coinmarketcap.com';
+
 async function getBlockchainInfo(domain, address, apiKey, currentBlock) {
 
 	let option = {
@@ -71,13 +75,6 @@ async function getBlockchainInfo(domain, address, apiKey, currentBlock) {
 
 	const client = Redis.fromEnv();
 	let allCoins = await client.get('coin_gecko_coins');
-	//const value = await client.get('crypto_market_data');
-
-
-	const coinMK_api_key = process.env.COINMARKETCAP_KEY;
-	const coinMK_domain = 'https://pro-api.coinmarketcap.com';
-
-	 
 
 	results_erc20_Trans.forEach( (transaction) => {
 		let tempSymbol = transaction.tokenSymbol;
@@ -91,8 +88,13 @@ async function getBlockchainInfo(domain, address, apiKey, currentBlock) {
 		}
 	});
 
+
+	//remove any spaces, dots, parenthesis, and symbols in the names
+	let arrTemp = Array.from(tempMap.keys()).map((key) => 
+		key.replaceAll(/[^0-9a-z]/gi, '') 
+	);
 	let cryptoMarketData = await axios.get(coinMK_domain + 
-		`/v2/cryptocurrency/quotes/latest?symbol=${Array.from(tempMap.keys())}&skip_invalid=true`, {
+		`/v2/cryptocurrency/quotes/latest?symbol=${arrTemp}&skip_invalid=true`, {
 			headers: {
 				'X-CMC_PRO_API_KEY': coinMK_api_key
 			}
@@ -124,15 +126,17 @@ async function getBlockchainInfo(domain, address, apiKey, currentBlock) {
 
 	async function getAmountUSD(coin, tempMap) {
 		let tempCoin = tempMap.get(coin);
-		optionTokenBalance.contractAddress = tempCoin.tokenAddress;
-		let searchStringTokenAmounts = "?module=account";
-		for (let key in optionTokenBalance) {
-			searchStringTokenAmounts += `&${key}=${optionTokenBalance[key]}`;
+		if(tempCoin != undefined) {
+			optionTokenBalance.contractAddress = tempCoin.tokenAddress;
+			let searchStringTokenAmounts = "?module=account";
+			for (let key in optionTokenBalance) {
+				searchStringTokenAmounts += `&${key}=${optionTokenBalance[key]}`;
+			}
+			let balance = await axios(domain + searchStringTokenAmounts)
+			tempCoin.amount = balance.data.result;
+			tempCoin.totalVal = tempCoin.amount * tempCoin.inUSD;
+			tempMap.set(coin, tempCoin);
 		}
-		let balance = await axios(domain + searchStringTokenAmounts)
-		tempCoin.amount = balance.data.result;
-		tempCoin.totalVal = tempCoin.amount * tempCoin.inUSD;
-		tempMap.set(coin, tempCoin);
 	}
 	//sorting by timeStamp since both lists are already sorted for us
 	insertSortedArray(arr, results_erc20_Trans);
@@ -154,7 +158,6 @@ function insertSortedArray(baseArray, resultsToAdd) {
 			}
 		}
 	}
-
 }
 
 module.exports = { getBlockchainInfo }

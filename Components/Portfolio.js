@@ -27,7 +27,7 @@ const Portfolio = () => {
 	const userRef = useRef();
 	const web3 = new Web3(window.ethereum);
 	const [allWallets, setAllWallets] = useState([]);
-	const [allWalletData, setAllWalletData] = useState([]);
+	const allWalletData = useRef([]);
 	const [visibility, setVisibility] = useState(false);
 	const [currentChain, setChain] = useState(null);
 	const [walletData, setWalletData] = useState(null)
@@ -38,7 +38,7 @@ const Portfolio = () => {
 	const [w3Id, setW3Id] = useState("");
 	const [showTransactions, setShowTransactions] = useState(false);
 	const [showNfts, setShowNfts] = useState(false);
-
+	const currentWallet = useRef("");
 	useEffect(async () => {
 		/*web3.eth.requestAccounts().then((acc) => {
 			setW3Id(acc[0].trim());
@@ -63,38 +63,61 @@ const Portfolio = () => {
 			allPromises.push(axios(`/api/wallet/${walletId}`));
 		});
 		Promise.all(allPromises).then((vals) => {
-			vals.map((val) => {
-				console.log(val.data);
-				setAllWalletData([...allWalletData, val.data]);	
+			let allWallets = {};
+			vals.forEach((wallet) => {
+				let walletData = wallet.data;
+				for(let wal in walletData) {
+					allWallets[wal] = walletData[wal];
+				}
 			});
+			allWalletData.current = allWallets;
+			let firstKey = Object.keys(allWalletData.current)[0];
+			currentWallet.current = firstKey;
+			setWalletData(allWalletData.current[firstKey]);
 			setChain(chains.ALL);
-			console.log(allWalletData);
 		}).catch((e) => {
 			console.log(e);
 		});
 	}, [allWallets]);
 
 	useEffect(() => {
-		switch (currentChain) {
-			case chains.ALL: 
-				$("#"+chains.ALL).focus();
-				changeChain(walletData);
-				setChainDomain(chainDomains.ALL);
-				break;
-			case chains.ETH:
-				changeChain(walletData.eth);
-				setChainDomain(chainDomains.ETH);
-				$("#"+chains.ETH).focus();
-				break;
-			case chains.BSC: 
-				changeChain(walletData.bsc);
-				setChainDomain(chainDomains.BSC);
-				$("#"+chains.BSC).focus();
-				break;
-			default:
-				break;
+		if(Object.keys(allWalletData.current).length != 0) {
+			switch (currentChain) {
+				case chains.ALL: 
+					$("#"+chains.ALL).addClass('ring-4 bg-yellow-200 ');
+					$("#"+chains.ETH).removeClass('ring-4 bg-yellow-200 ');
+					$("#"+chains.BSC).removeClass('ring-4 bg-yellow-200 ');
+					changeChain(walletData);
+					setChainDomain(chainDomains.ALL);
+					break;
+				case chains.ETH:
+					$("#"+chains.ETH).addClass('ring-4 bg-yellow-200 ');
+					$("#"+chains.ALL).removeClass('ring-4 bg-yellow-200 ');
+					$("#"+chains.BSC).removeClass('ring-4 bg-yellow-200 ');
+					changeChain(walletData.eth);
+					setChainDomain(chainDomains.ETH);
+					$("#"+chains.ETH).focus();
+					break;
+				case chains.BSC: 
+					$("#"+chains.BSC).addClass('ring-4 bg-yellow-200 ');
+					$("#"+chains.ALL).removeClass('ring-4 bg-yellow-200 ');
+					$("#"+chains.ETH).removeClass('ring-4 bg-yellow-200 ');
+					changeChain(walletData.bsc);
+					setChainDomain(chainDomains.BSC);
+					$("#"+chains.BSC).focus();
+					break;
+				default:
+					break;
+			}
 		}
 	}, [currentChain]);
+
+	const changeWallet = (walletId) => {
+		setWalletData(allWalletData.current[walletId]);
+		setChain(chains.ALL);
+		currentWallet.current = walletId;
+	}
+
 
 	const sort = (baseArray, resultsToAdd) => {
 		let i = 0;
@@ -115,6 +138,7 @@ const Portfolio = () => {
 	}
 
 	const getAllTransactions = (walletData) => {
+		console.log(walletData);
 		let allTransactions = [];
 		for(let key in walletData) {
 			let currData = walletData[key][0];
@@ -217,7 +241,7 @@ const Portfolio = () => {
 	return (
 		<div className="flex h-full w-full flex-row absolute items-center">
 
-		<WalletList setVisibility={setVisibility} allWallets={allWallets} />	
+		<WalletList setVisibility={setVisibility} allWallets={allWallets} changeWallet={changeWallet} currentWallet={currentWallet.current}/>	
 		<div className="flex h-full w-9/12 flex-col absolute items-center float-right right-0">
 		<div style={{'visibility':(visibility ? 'visible' : 'hidden')}} className="flex h-full rounded-xl w-full bg-gray-200 z-100 absolute">
 		</div>
