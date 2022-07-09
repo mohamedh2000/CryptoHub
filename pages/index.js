@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import CryptoMarket from './cryptomarket';
 import Donation from './donate';
+import WhaleWatch from '../Components//WhaleWatch.js';
 import NavBar from '../Components/NavBar.js';
 import Portfolio from '../Components/Portfolio.js'
 import '../styles/Home.module.css';
@@ -91,7 +92,8 @@ export default function Home() {
         (cryptoMarket ? <CryptoMarket /> :
            donation ? <Donation /> : 
            marketplace ? <MarketPlace /> :
-           <Portfolio />
+           whaleWatch ? <WhaleWatch /> :
+		<Portfolio />
           )
       }
       </div>

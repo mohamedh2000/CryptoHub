@@ -17,7 +17,8 @@ const UserChart = ({userCoins, currentChain, setChain}) => {
 		if(chainName != e.name) {
 			setChainName(e.name);
 			let newData = e.coins;
-			setChainData(newData);	
+			setChainData(newData);
+			setCoin({});
 		}
 	}
 
@@ -67,6 +68,7 @@ const UserChart = ({userCoins, currentChain, setChain}) => {
 
 	return (
 		<main>
+		{console.log(userCoins)}
 		{  
 			(currentChain != 'all' ? 
 				<PieChart width={800} height={600}>

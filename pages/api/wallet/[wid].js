@@ -26,17 +26,21 @@ export default async function handler(req, res){
 	for( let key in optionBlockNum) {
 		searchStringBlock += `&${key}=${optionBlockNum[key]}`;
 	}
+	if(req.query.wid) {
+		let currentEthBlock = getBlock(blockchainDomains.ethDomain, searchStringBlock); //eth
+		let currentBscBlock = getBlock(blockchainDomains.bscDomain, searchStringBlock); //bsc
+		let ethRet = await getBlockchainInfo.getBlockchainInfo(blockchainDomains.ethDomain, req.query.wid, 
+			blockchainApis.ethKey, currentEthBlock);
 
-	let currentEthBlock = getBlock(blockchainDomains.ethDomain, searchStringBlock); //eth
-	let currentBscBlock = getBlock(blockchainDomains.bscDomain, searchStringBlock); //bsc
-	let ethRet = await getBlockchainInfo.getBlockchainInfo(blockchainDomains.ethDomain, req.query.wid, 
-		blockchainApis.ethKey, currentEthBlock);
-
-	let bscRet = await getBlockchainInfo.getBlockchainInfo(blockchainDomains.bscDomain, req.query.wid, 
-		blockchainApis.bscKey, currentBscBlock);
-	let ret = {};
-	ret[req.query.wid] = { eth: ethRet, bsc: bscRet };
-	res.status(200).send(ret);
+		let bscRet = await getBlockchainInfo.getBlockchainInfo(blockchainDomains.bscDomain, req.query.wid, 
+			blockchainApis.bscKey, currentBscBlock);
+		let ret = {};
+		ret[req.query.wid] = { eth: ethRet };
+		if(bscRet != {}) {
+			ret[req.query.wid]['bsc'] = bscRet;
+		}
+		res.status(200).send(ret);
+	}
 }
 
 async function getBlock(domain, searchBlock) {

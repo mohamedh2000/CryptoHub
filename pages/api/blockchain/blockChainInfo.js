@@ -66,7 +66,9 @@ async function getBlockchainInfo(domain, address, apiKey, currentBlock) {
 		arr.push(results_ethTrans[x]);
 	} //circular json issue so use this as a get around for now
 
+
 	let erc20_data = await axios(domain + searchStringErc20);
+	console.log(address);
 	let results_erc20_Trans = erc20_data['data']['result'];
 	let nft_data = await axios(domain + searchStringNft)
 	let results_nft_Trans = nft_data['data']['result'];
@@ -87,7 +89,6 @@ async function getBlockchainInfo(domain, address, apiKey, currentBlock) {
 			tempMap.set(tempSymbol.toLowerCase(), val);
 		}
 	});
-
 
 	//remove any spaces, dots, parenthesis, and symbols in the names
 	let arrTemp = Array.from(tempMap.keys()).map((key) => 

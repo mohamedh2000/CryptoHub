@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { getSession } from "next-auth/react"
 import { Redis } from '@upstash/redis'; 
+import { Audio } from  'react-loader-spinner'
 
 const chains = {
 	ALL : 'all', ETH : 'eth', BSC : 'bsc'
@@ -27,7 +28,6 @@ const Portfolio = () => {
 	const userRef = useRef();
 	const web3 = new Web3(window.ethereum);
 	const [allWallets, setAllWallets] = useState([]);
-	const allWalletData = useRef([]);
 	const [visibility, setVisibility] = useState(false);
 	const [currentChain, setChain] = useState(null);
 	const [walletData, setWalletData] = useState(null)
@@ -39,6 +39,8 @@ const Portfolio = () => {
 	const [showTransactions, setShowTransactions] = useState(false);
 	const [showNfts, setShowNfts] = useState(false);
 	const currentWallet = useRef("");
+	const [receivedData, setReceivedData] = useState(false);
+
 	useEffect(async () => {
 		/*web3.eth.requestAccounts().then((acc) => {
 			setW3Id(acc[0].trim());
@@ -58,51 +60,39 @@ const Portfolio = () => {
 	}, []);
 
 	useEffect(async () => {
-		let allPromises = [];
-		allWallets.map((walletId) => {
-			allPromises.push(axios(`/api/wallet/${walletId}`));
-		});
-		Promise.all(allPromises).then((vals) => {
-			let allWallets = {};
-			vals.forEach((wallet) => {
-				let walletData = wallet.data;
-				for(let wal in walletData) {
-					allWallets[wal] = walletData[wal];
-				}
-			});
-			allWalletData.current = allWallets;
-			let firstKey = Object.keys(allWalletData.current)[0];
-			currentWallet.current = firstKey;
-			setWalletData(allWalletData.current[firstKey]);
+		if(allWallets.length != 0) {
+			console.log(allWallets);
+			let wallet = await getWalletData(allWallets[0]);
+			let walletData = wallet.data;
+			currentWallet.current = allWallets[0];
+			setWalletData(walletData);
 			setChain(chains.ALL);
-		}).catch((e) => {
-			console.log(e);
-		});
+			setReceivedData(true);
+		}
 	}, [allWallets]);
 
+	const getWalletData = async (walletId) => {
+		if(receivedData){
+			setReceivedData(false);
+		}
+		return await axios(`/api/wallet/${walletId}`);	
+	}
+
 	useEffect(() => {
-		if(Object.keys(allWalletData.current).length != 0) {
+		if(currentWallet.current != "") {
+			let walletId = Object.keys(walletData);	
 			switch (currentChain) {
 				case chains.ALL: 
-					$("#"+chains.ALL).addClass('ring-4 bg-yellow-200 ');
-					$("#"+chains.ETH).removeClass('ring-4 bg-yellow-200 ');
-					$("#"+chains.BSC).removeClass('ring-4 bg-yellow-200 ');
 					changeChain(walletData);
 					setChainDomain(chainDomains.ALL);
 					break;
 				case chains.ETH:
-					$("#"+chains.ETH).addClass('ring-4 bg-yellow-200 ');
-					$("#"+chains.ALL).removeClass('ring-4 bg-yellow-200 ');
-					$("#"+chains.BSC).removeClass('ring-4 bg-yellow-200 ');
-					changeChain(walletData.eth);
+					changeChain(walletData[walletId].eth);
 					setChainDomain(chainDomains.ETH);
 					$("#"+chains.ETH).focus();
 					break;
 				case chains.BSC: 
-					$("#"+chains.BSC).addClass('ring-4 bg-yellow-200 ');
-					$("#"+chains.ALL).removeClass('ring-4 bg-yellow-200 ');
-					$("#"+chains.ETH).removeClass('ring-4 bg-yellow-200 ');
-					changeChain(walletData.bsc);
+					changeChain(walletData[walletId].bsc);
 					setChainDomain(chainDomains.BSC);
 					$("#"+chains.BSC).focus();
 					break;
@@ -113,7 +103,9 @@ const Portfolio = () => {
 	}, [currentChain]);
 
 	const changeWallet = (walletId) => {
-		setWalletData(allWalletData.current[walletId]);
+		getWalletData(walletId).then((data) => {
+			setWalletData(data.data);
+		})
 		setChain(chains.ALL);
 		currentWallet.current = walletId;
 	}
@@ -141,7 +133,9 @@ const Portfolio = () => {
 		let allTransactions = [];
 		for(let key in walletData) {
 			let currData = walletData[key][0];
-			currData.map((trans) => {trans.chain = key.toUpperCase()});
+			currData.map((trans) => {
+				trans.chain = key.toUpperCase()
+			});
 			(allTransactions.length == 0 ? 
 				allTransactions.push(...currData) :
 				sort(allTransactions, currData));
@@ -177,11 +171,13 @@ const Portfolio = () => {
 	}
 
 	const changeChain = (walletData) => {
+		console.log(walletData);
+		let currWallet = Object.keys(walletData);
 		switch(currentChain) {
 			case chains.ALL: 
-				let transactions = getAllTransactions(walletData); //this will sort all transactions as well
-				let allCoins = getAllCoins(walletData);
-				let allNFTs = getAllNFTs(walletData);
+				let transactions = getAllTransactions(walletData[currWallet]); //this will sort all transactions as well
+				let allCoins = getAllCoins(walletData[currWallet]);
+				let allNFTs = getAllNFTs(walletData[currWallet]);
 				setTransactions(transactions);
 				setNfts(allNFTs);
 				setCoins(allCoins);
@@ -215,21 +211,23 @@ const Portfolio = () => {
 
 	const style = {
 		chainStyle: "ring-2 ring-white shadow-xl py-3 focus:outline-none m-2 rounded-lg w-32" + 
-		" focus:ring-4 focus:ring-yellow-400 focus:ring-opacity-50",
+		" hover:bg-gray-200 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50",
 		walletStyle: "bg-yellow-400 text-white text-base w-full rounded-full font-semibold py-2 px-4 shadow-md" + 
 		" hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400" + 
-		" focus:ring-offset-2 focus:ring-offset-yellow-200 "
+		" focus:ring-offset-2 focus:ring-offset-yellow-200 ",
+		audio: 'flex absolute items-center justify-center w-9/12 float-right right-0'
 	}
 
 	const getChainCoins = () => {
 		let retArr = []
-		for(let key in walletData) {
+		let currentWall = Object.keys(walletData)[0]
+		for(let key in 	walletData[currentWall]) {
 			let chainData = {};
 			chainData.chain = key;
-			chainData.coins = walletData[key][1];
+			chainData.coins = walletData[currentWall][key][1];
 			chainData.amount = 0;
 			chainData.color = "#" + ((1<<24)*Math.random() | 0).toString(16);
-			walletData[key][1].forEach((coin) => {
+			walletData[currentWall][key][1].forEach((coin) => {
 				chainData.amount += (coin.amount * coin.inUSD)
 			});
 			retArr.push(chainData);
@@ -239,94 +237,104 @@ const Portfolio = () => {
 
 	return (
 		<div className="flex h-full w-full flex-row absolute items-center">
-
-		<WalletList setVisibility={setVisibility} allWallets={allWallets} changeWallet={changeWallet} currentWallet={currentWallet.current}/>	
-		<div className="flex h-full w-9/12 flex-col absolute items-center float-right right-0">
-		<div style={{'visibility':(visibility ? 'visible' : 'hidden')}} className="flex h-full rounded-xl w-full bg-gray-200 z-100 absolute">
-		</div>
-		<WalletForm setVisibility={setVisibility} setAllWallets={setAllWallets} visible={visibility} userId={userRef.current} />	
-		<div>
-		<button id={chains.ALL} className={style.chainStyle} onClick={() => {setChain(chains.ALL)}}>
-		All	
-		</button>
-		<button id={chains.ETH} className={style.chainStyle} onClick={() => {setChain(chains.ETH)}}>
-		ETH
-		</button>
-		<button id={chains.BSC} className={style.chainStyle} onClick={() => {setChain(chains.BSC)}} >
-		BSC
-		</button>
-		</div>
-		<div id="wallet_chart" className="mt-20">
-		<UserChart userCoins={
-			(currentChain != 'all' ? coins : getChainCoins())
-		} currentChain={currentChain} setChain={setChain}/>
-		</div>
-		<div className="flex columns-2 w-full" >  
-		<div className="flex w-1/2 flex-col items-center">
-		<button
-		className="rounded-xl mr-5 flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
-		onClick={() => {
-			setShowTransactions(!showTransactions);
-		}}
-		>
-		Transactions
-		</button>
-		<AnimatePresence >
-		{showTransactions && (
-			<motion.ul
-			id="collapseTrans"
-			className=" flex flex-col  w-3/4 max-w-5xl overflow-y-scroll"
-			style={{  marginTop: "20px" }}
-			variants={container}
-			initial={{ opacity: 0 }}
-			animate="show"
-			exit="hidden"
-			>
-			{transactions.map((trans) => (
-				<Transaction
-				key="trans_1"
-				props={trans}
-				w3={web3}
-				w3Id={w3Id}
-				currentChain={chainDomain != null ? chainDomain : chainDomains[trans.chain]}
-				/>
-			))}
-			</motion.ul>
-		)}
-		</AnimatePresence>
-		</div>
-		<div className="flex w-1/2 flex-col items-center">
-		<button
-		className="rounded-xl flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
-		onClick={() => {
-			setShowNfts(!showNfts);
-		}}
-		>
-		Nfts
-		</button>
-		<AnimatePresence >
-		{showNfts && (
-			<motion.ul
-			id="collapseNft"
-			className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll"
-			style={{ marginTop: "20px" }}
-			variants={container}
-			initial={{ opacity: 0 }}
-			animate="show"
-			exit="hidden"
-			>
-			{nfts.map((nftInfo) => (
-				<Nft
-				key="nfts"
-				nft={nftInfo}
-				/>
-			))}
-			</motion.ul>
-		)}
-		</AnimatePresence>
-		</div>
-		</div>
-		</div>
+			<WalletList setVisibility={setVisibility} allWallets={allWallets} changeWallet={changeWallet} currentWallet={currentWallet.current}/>	
+			{receivedData ?
+				<div className="flex h-full w-9/12 flex-col absolute items-center float-right right-0">
+					<div style={{'visibility':(visibility ? 'visible' : 'hidden')}} className="flex h-full rounded-xl w-full bg-gray-200 z-100 absolute">
+					</div>
+					<WalletForm setVisibility={setVisibility} setAllWallets={setAllWallets} visible={visibility} userId={userRef.current} />	
+					<div>
+						<button id={chains.ALL} className={style.chainStyle} onClick={() => {setChain(chains.ALL)}}>
+						All	
+						</button>
+						<button id={chains.ETH} className={style.chainStyle} onClick={() => {setChain(chains.ETH)}}>
+						ETH
+						</button>
+						<button id={chains.BSC} className={style.chainStyle} onClick={() => {setChain(chains.BSC)}} >
+						BSC
+						</button>
+					</div>
+					<div id="wallet_chart" className="mt-20">
+						<UserChart userCoins={
+							(currentChain != 'all' ? coins : getChainCoins())
+						} currentChain={currentChain} setChain={setChain}/>
+					</div>
+					<div className="flex columns-2 w-full" >  
+						<div className="flex w-1/2 flex-col items-center">
+							<button
+							className="rounded-xl mr-5 flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
+							onClick={() => {
+								setShowTransactions(!showTransactions);
+							}}
+							>
+							Transactions
+							</button>
+							<AnimatePresence >
+							{showTransactions && (
+								<motion.ul
+								id="collapseTrans"
+								className=" flex flex-col  w-3/4 max-w-5xl overflow-y-scroll"
+								style={{  marginTop: "20px" }}
+								variants={container}
+								initial={{ opacity: 0 }}
+								animate="show"
+								exit="hidden"
+								>
+								{transactions.map((trans) => (
+									<Transaction
+									key="trans_1"
+									props={trans}
+									w3={web3}
+									w3Id={w3Id}
+									currentChain={chainDomain != null ? chainDomain : chainDomains[trans.chain]}
+									/>
+								))}
+								</motion.ul>
+							)}
+							</AnimatePresence>
+						</div>
+						<div className="flex w-1/2 flex-col items-center">
+							<button
+							className="rounded-xl flex text-center justify-center tracking-wide text-2xl font-bold w-3/4 p-4 max-w-5xl shadow-xl ring-4 ring-yellow-400"
+							onClick={() => {
+								setShowNfts(!showNfts);
+							}}
+							>
+							Nfts
+							</button>
+							<AnimatePresence >
+							{showNfts && (
+								<motion.ul
+								id="collapseNft"
+								className="flex-col flex mt-5 w-3/4 max-w-5xl overflow-y-scroll"
+								style={{ marginTop: "20px" }}
+								variants={container}
+								initial={{ opacity: 0 }}
+								animate="show"
+								exit="hidden"
+								>
+								{nfts.map((nftInfo) => (
+									<Nft
+									key="nfts"
+									nft={nftInfo}
+									/>
+								))}
+								</motion.ul>
+							)}
+							</AnimatePresence>
+						</div>
+					</div>
+				</div>
+					:
+				<div className={style.audio}>
+					<Audio
+					    height="100"
+					    width="100"
+					    color='gold'
+					    ariaLabel='loading'
+					/> 
+				</div>
+			}
 		</div>
 	);
 };
