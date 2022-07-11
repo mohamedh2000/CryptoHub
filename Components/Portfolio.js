@@ -61,7 +61,6 @@ const Portfolio = () => {
 
 	useEffect(async () => {
 		if(allWallets.length != 0) {
-			console.log(allWallets);
 			let wallet = await getWalletData(allWallets[0]);
 			let walletData = wallet.data;
 			currentWallet.current = allWallets[0];
@@ -104,6 +103,7 @@ const Portfolio = () => {
 
 	const changeWallet = (walletId) => {
 		getWalletData(walletId).then((data) => {
+			setReceivedData(true);
 			setWalletData(data.data);
 		})
 		setChain(chains.ALL);
@@ -171,7 +171,6 @@ const Portfolio = () => {
 	}
 
 	const changeChain = (walletData) => {
-		console.log(walletData);
 		let currWallet = Object.keys(walletData);
 		switch(currentChain) {
 			case chains.ALL: 

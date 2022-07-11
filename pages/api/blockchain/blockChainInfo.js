@@ -68,7 +68,6 @@ async function getBlockchainInfo(domain, address, apiKey, currentBlock) {
 
 
 	let erc20_data = await axios(domain + searchStringErc20);
-	console.log(address);
 	let results_erc20_Trans = erc20_data['data']['result'];
 	let nft_data = await axios(domain + searchStringNft)
 	let results_nft_Trans = nft_data['data']['result'];
