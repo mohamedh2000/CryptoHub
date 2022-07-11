@@ -30,9 +30,6 @@ export default function CryptoMarket() {
 	function openDashboard(cid) {
 		axios(`/api/crypto/id/${cid}`).then((data) => {
 			axios(`api/crypto/metadata/${cid}`).then((metadata) => {
-				console.log(metadata.data.data);
-				console.log(cid);
-				console.log(data.data[0].data);
 				setChosenCryptoData(data.data[0].data[cid]);
 				setChosenCID(cid);
 				setChosenCrypto(true);
@@ -63,6 +60,7 @@ export default function CryptoMarket() {
 			{
 				listings.map(crypto_data =>
 					<motion.li className=".flex"
+					key={crypto_data.id}
 					variants={item}
 					initial="hidden"
 					animate="show">

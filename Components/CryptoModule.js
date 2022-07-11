@@ -20,7 +20,6 @@ const CryptoModule = ({ data, CID, metaData }) => {
 	const activeBookmarkCSS = "p-2 right-0 bg-yellow-400 rounded-full px-3.5 float-right";
 	const inActiveBookmarkCSS = "p-2 right-0 rounded-full px-3.5 hover:bg-yellow-200 float-right";
 
-
 	function activateButton(name) {
 		if(name == "portfolio") {
 			setChartTab(false);
@@ -103,7 +102,7 @@ const CryptoModule = ({ data, CID, metaData }) => {
 					Object.keys(metaData['urls']).map((url) => {
 						if(metaData['urls'][url].length == 1) {
 							<div>
-								url: <a> metaData['urls'][url][0] </a>
+							 url: <a> {metaData['urls'][url][0] }</a>
 							</div>
 						}
 

@@ -30,14 +30,14 @@ const WalletForm  = ({setVisibility, setAllWallets, visible, userId}) => {
 			<div className="flex justify-left space-x-3">
 			<div className="form-check form-check-inline">
 			<input className="rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="ETH" />
-			<label className="form-check-label inline-block tracking-Wider " for="inlineRadio1">ETH</label>
+			<label className="form-check-label inline-block tracking-Wider " htmlFor="inlineRadio1">ETH</label>
 			</div>
 			<div className="form-check form-check-inline">
 			<input className="rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="BSC" />
-			<label className="form-check-label tracking-wider inline-block" for="inlineRadio20">BSC</label>
+			<label className="form-check-label tracking-wider inline-block" htmlFor="inlineRadio20">BSC</label>
 			</div>
 			</div>
-			<label for="fwallet" className="font-extrabold tracking-wide"> Wallet ID </label>
+			<label htmlFor="fwallet" className="font-extrabold tracking-wide"> Wallet ID </label>
 			<input id="fwallet" className="rounded-xl outline-none shadow-lg p-2" type="text" /><br/>
 
 			<button value="Add Wallet" onClick={() => addWallet()} className={style.addButtonStyle + " bg-yellow-300 hover:bg-yellow-400"} > Add Wallet </button>

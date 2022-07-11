@@ -18,7 +18,7 @@ const WalletList  = ({setVisibility, allWallets, changeWallet, currentWallet}) =
 				<ul className="flex flex-col space-y-10 max-h-36 w-full" style={{marginTop:'20%'}}>
 					{
 						allWallets.map((walletId) => 
-							<li onClick={() => changeWallet(walletId)} 
+							<li key={walletId} onClick={() => changeWallet(walletId)} 
 								className={walletId == currentWallet ? 
 										(style.walletStyle + " bg-yellow-400") : 
 										(style.walletStyle + " bg-yellow-200")}>
