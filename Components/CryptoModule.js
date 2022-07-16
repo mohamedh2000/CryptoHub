@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBookmark, faChartPie, faChartBar, faComments } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
 import { getNum } from './func';
-import CryptoChart from '../Components/CryptoChart.js';
+import CryptoChart from './CryptoChart.js';
+import MetaDataInfo from './MetaDataInfo.js';
 import axios from 'axios';
 import $ from 'jquery';
 
@@ -50,13 +51,12 @@ const CryptoModule = ({ data, CID, metaData }) => {
 	}, [data]);
 
 	return (
-		<motion.div className=".select-none shadow-2xl bg-white rounded-xl flex
-		shadow-lg w-1/2 my-4 right-0 justify-center mr-8 p-8 flex-col sticky"
-		style={{y: '-100%', height:'80vh'}}
-		animate={{ y: '100px'}}
+		<motion.div className="shadow-2xl bg-white rounded-xl flex ml-5 shadow-lg w-1/2 my-4 right-0 justify-center mr-8 p-8 flex-col sticky"
+		style={{x: '200%', height:'50%' }}
+		animate={{ x: '0px'}}
 		transition={{ type: "easein"}}
 		>
-			<div className="w-full h-1/10 r-0 my-1 top-0">
+			<div className="w-full h-1/10 r-0 my-1 ">
 				<button 
 				className={chartTab ? activeTabCSS : inActiveTabCSS}
 				onClick={() => {activateButton("chart")}}>
@@ -82,8 +82,8 @@ const CryptoModule = ({ data, CID, metaData }) => {
 			</div>
 			<div className=" w-full my-1 h-full space-y-10">
 				{
-					(metaData != undefined ? 
-					<div>
+					(metaData ? 
+					<div >
 						<img src={metaData['logo']} />
 						<b>Description: </b>
 						<i>{metaData['description']}</i>
@@ -94,23 +94,13 @@ const CryptoModule = ({ data, CID, metaData }) => {
 				}
 				<div className="chartContainer w-full">
 					<CryptoChart chartData={currentData} 
-					containerWidth={$(".chartContainer").width()}/> 
+					containerWidth={$(".chartContainer").width()} containerHeight={400} toolTip={true}/> 
 				</div>
 			</div>
-			{
-				(metaData != undefined ? (
-					Object.keys(metaData['urls']).map((url) => {
-						if(metaData['urls'][url].length == 1) {
-							<div>
-							 url: <a> {metaData['urls'][url][0] }</a>
-							</div>
-						}
-
-					}))
-					: 
-					<></>
-				)
-			}
+			{console.log(metaData)}
+			{ metaData ? 
+				<MetaDataInfo meta={metaData} />
+				: <></>}
 		</motion.div>)
 }
 export default CryptoModule;

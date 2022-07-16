@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip} from 'recharts';
 import { getNum } from './func.js';
 
-const CryptoChart = ({ chartData, containerWidth}) => {
+const CryptoChart = ({ chartData, containerWidth, containerHeight, toolTip}) => {
 	const [chartPrices, setChartPrices] = useState([]);
 
 	useEffect(() => {
@@ -23,14 +23,14 @@ const CryptoChart = ({ chartData, containerWidth}) => {
 
 	return (
 		<AreaChart className="mt-10" width={containerWidth} 
-			height={400} data={chartPrices}
+			height={containerHeight} data={chartPrices}
 			margin={{
 				top: 10,
 				right: 30,
 				left: 0,
 				bottom: 0,
 			}}>
-				<Tooltip  />
+		{ toolTip ? <Tooltip  /> : <></>}
 				<Area type="monotone" dataKey="price" stackId="1" 
 					stroke="#FFBF00" fill="#FFBF00" />
 				<Area type="monotone" dataKey="marketCap" stackId="1"

@@ -54,6 +54,9 @@ const Portfolio = () => {
 			userRef.current = userData.user.email; 
 			axios(`/api/user/${userRef.current}`).then((userInfo) => {
 				setAllWallets(userInfo.data);
+				if(userInfo.data.length == 0) {
+					setReceivedData(true);
+				}
 			});
 		});
 
@@ -75,6 +78,29 @@ const Portfolio = () => {
 			setReceivedData(false);
 		}
 		return await axios(`/api/wallet/${walletId}`);	
+	}
+
+	const deleteWallet = async () => {
+		axios({method: 'post', url: `/api/user/remove/${userRef.current}`,     
+			data: {'walletId': currentWallet.current}
+		}).then((res) => {
+                	if(res.status == 200) {
+				allWallets.splice(allWallets.indexOf(currentWallet.current),1);
+				if(allWallets.length != 0) {
+					changeWallet(allWallets[0]);
+				}
+				else {
+					setWalletData(null);
+					currentWallet.current = ""; 
+				}
+			}
+		}).catch((e) => {
+			console.log(e);
+		});
+	}
+
+	const refreshWallet = async () => {
+
 	}
 
 	useEffect(() => {
@@ -219,24 +245,27 @@ const Portfolio = () => {
 
 	const getChainCoins = () => {
 		let retArr = []
-		let currentWall = Object.keys(walletData)[0]
-		for(let key in 	walletData[currentWall]) {
-			let chainData = {};
-			chainData.chain = key;
-			chainData.coins = walletData[currentWall][key][1];
-			chainData.amount = 0;
-			chainData.color = "#" + ((1<<24)*Math.random() | 0).toString(16);
-			walletData[currentWall][key][1].forEach((coin) => {
-				chainData.amount += (coin.amount * coin.inUSD)
-			});
-			retArr.push(chainData);
+		if(walletData) {
+			let currentWall = Object.keys(walletData)[0]
+			for(let key in 	walletData[currentWall]) {
+				let chainData = {};
+				chainData.chain = key;
+				chainData.coins = walletData[currentWall][key][1];
+				chainData.amount = 0;
+				chainData.color = "#" + ((1<<24)*Math.random() | 0).toString(16);
+				walletData[currentWall][key][1].forEach((coin) => {
+					chainData.amount += (coin.amount * coin.inUSD)
+				});
+				retArr.push(chainData);
+			}
 		}
 		return retArr;
 	}
 
 	return (
 		<div className="flex h-full w-full flex-row absolute items-center">
-			<WalletList setVisibility={setVisibility} allWallets={allWallets} changeWallet={changeWallet} currentWallet={currentWallet.current}/>	
+			<WalletList setVisibility={setVisibility} allWallets={allWallets} changeWallet={changeWallet} 
+					currentWallet={currentWallet.current} refreshWallet={refreshWallet} deleteWallet={deleteWallet}/>	
 			{receivedData ?
 				<div className="flex h-full w-9/12 flex-col absolute items-center float-right right-0">
 					<div style={{'visibility':(visibility ? 'visible' : 'hidden')}} className="flex h-full rounded-xl w-full bg-gray-200 z-100 absolute">
