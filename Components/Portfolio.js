@@ -3,9 +3,9 @@ import Web3 from 'web3'
 import axios from 'axios';
 import Transaction from './Transaction';
 import { motion, AnimatePresence } from 'framer-motion';
-import UserChart from '../Components/UserChart';
-import Nft from '../Components/Nft';
-import WalletList from '../Components/WalletList.js';
+import UserChart from './UserChart';
+import Nft from './Nft';
+import WalletList from './WalletList.js';
 import WalletForm from './WalletForm.js';
 import $ from 'jquery';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

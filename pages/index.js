@@ -6,6 +6,7 @@ import NavBar from '../Components/NavBar.js';
 import Portfolio from '../Components/Portfolio.js'
 import '../styles/Home.module.css';
 import MarketPlace from '../Components/MarketPlace.js';
+import UpdatedChart from '../Components/UpdatedChart.js';
 
 export default function Home() {
 
@@ -93,7 +94,8 @@ export default function Home() {
            donation ? <Donation /> : 
            marketplace ? <MarketPlace /> :
            whaleWatch ? <WhaleWatch /> :
-		<Portfolio />
+		portfolio ? <Portfolio /> : 
+		<UpdatedChart />
           )
       }
       </div>

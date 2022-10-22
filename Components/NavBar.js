@@ -36,7 +36,7 @@ const NavBar = ({setPage}) => {
 			onClick={() => {menuPressed()}}>
 			<FontAwesomeIcon style={{height:'25px', width:'25px'}} icon={faBars} /> 
 		    </motion.button>
-		    <motion.button className={buttonStyling}> 
+		    <motion.button className={buttonStyling} onClick={() => setPage("home")}> 
 			<FontAwesomeIcon  icon={faHome} /> 
 			Home
 		    </motion.button>
